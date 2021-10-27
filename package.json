@@ -4,8 +4,12 @@
   "description": "Given a Mocha / Cypress spec file, returns the list of suite and test names",
   "main": "src",
   "files": [
+    "bin",
     "src"
   ],
+  "bin": {
+    "find-test-names": "bin/find-test-names.js"
+  },
   "scripts": {
     "test": "ava",
     "semantic-release": "semantic-release"
@@ -27,7 +31,8 @@
   "homepage": "https://github.com/bahmutov/find-test-names#readme",
   "dependencies": {
     "acorn": "^8.5.0",
-    "acorn-walk": "^8.2.0"
+    "acorn-walk": "^8.2.0",
+    "simple-bin-help": "^1.7.6"
   },
   "devDependencies": {
     "ava": "^3.15.0",

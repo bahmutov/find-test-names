@@ -18,6 +18,15 @@ const result = getTestNames(specSourceCode)
 // { "suiteNames": [], "testNames": [] }
 ```
 
+### Bin
+
+This package includes [bin/find-test-names.js](./bin/find-test-names.js) that you can use from the command line
+
+```shell
+$ npx find-test-names <path to the spec file>
+# prints the describe and test names found in the spec file
+```
+
 ## Small print
 
 Author: Gleb Bahmutov &lt;gleb.bahmutov@gmail.com&gt; &copy; 2021
