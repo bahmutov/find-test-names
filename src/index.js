@@ -9,7 +9,12 @@ const isIt = (node) =>
 
 function getTestNames(source) {
   // should we pass the ecma version here?
-  const AST = acorn.parse(source, { ecmaVersion: 6 })
+  let AST
+  try {
+    AST = acorn.parse(source, { ecmaVersion: 2022, sourceType: 'script' })
+  } catch (e) {
+    AST = acorn.parse(source, { ecmaVersion: 2022, sourceType: 'module' })
+  }
 
   const suiteNames = []
   const testNames = []
