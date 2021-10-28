@@ -24,6 +24,16 @@ const getTags = (source, node) => {
   }
 }
 
+// extracts the test name from the literal or template literal node
+const extractTestName = (node) => {
+  if (node.type === 'TemplateLiteral') {
+    return node.quasis.map((q) => q.value.cooked.trim()).join(' ')
+  } else if (node.type === 'Literal') {
+    return node.value
+  }
+  throw new Error(`Unsupported node type: ${node.type}`)
+}
+
 /**
  * Returns all suite and test names found in the given JavaScript
  * source code (Mocha / Cypress syntax)
@@ -47,26 +57,28 @@ function getTestNames(source) {
   walk.simple(AST, {
     CallExpression(node) {
       if (isDescribe(node)) {
+        const name = extractTestName(node.arguments[0])
         const suiteInfo = {
-          name: node.arguments[0].value,
+          name,
         }
 
         const tags = getTags(source, node)
         if (Array.isArray(tags) && tags.length > 0) {
           suiteInfo.tags = tags
         }
-        suiteNames.push(suiteInfo.name)
+        suiteNames.push(name)
         tests.push(suiteInfo)
       } else if (isIt(node)) {
+        const name = extractTestName(node.arguments[0])
         const testInfo = {
-          name: node.arguments[0].value,
+          name,
         }
 
         const tags = getTags(source, node)
         if (Array.isArray(tags) && tags.length > 0) {
           testInfo.tags = tags
         }
-        testNames.push(testInfo.name)
+        testNames.push(name)
         tests.push(testInfo)
       }
     },
