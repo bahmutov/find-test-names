@@ -15,7 +15,16 @@ $ yarn add -D find-test-names
 ```js
 const { getTestNames } = require('find-test-names')
 const result = getTestNames(specSourceCode)
-// { "suiteNames": [], "testNames": [] }
+// { "suiteNames": [], "testNames": [], "tests": [] }
+```
+
+The `tests` is a list with each test and suite name, and optional list of tags.
+
+```js
+// spec.js
+it('works', {tags: ['@user']}, () => { ... })
+// found test names
+// { tests: [{ name: 'works', tags: ['@user'] }] }
 ```
 
 ### Bin

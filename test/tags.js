@@ -1,12 +1,12 @@
 const { stripIndent } = require('common-tags')
 const test = require('ava')
-const { getTestNames } = require('..')
+const { getTestNames } = require('../src')
 
-test('basic', (t) => {
+test('test with tags', (t) => {
   t.plan(1)
   const source = stripIndent`
     describe('foo', () => {
-      it('bar', () => {})
+      it('bar', {tags: ['@one']}, () => {})
     })
   `
   const result = getTestNames(source)
@@ -16,6 +16,7 @@ test('basic', (t) => {
     tests: [
       {
         name: 'bar',
+        tags: ['@one'],
       },
       {
         name: 'foo',
@@ -24,11 +25,10 @@ test('basic', (t) => {
   })
 })
 
-test('ES6 modules with import keyword', (t) => {
+test('describe with tags', (t) => {
   t.plan(1)
   const source = stripIndent`
-    import {foo} from './foo'
-    describe('foo', () => {
+    describe('foo', {tags: ['@one', '@two']}, () => {
       it('bar', () => {})
     })
   `
@@ -42,6 +42,7 @@ test('ES6 modules with import keyword', (t) => {
       },
       {
         name: 'foo',
+        tags: ['@one', '@two'],
       },
     ],
   })
