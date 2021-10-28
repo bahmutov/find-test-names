@@ -14,8 +14,12 @@ const getTags = (source, node) => {
       return node.key.name === 'tags'
     })
     if (tags) {
-      const tagsText = source.slice(tags.start, tags.end)
-      return eval(tagsText)
+      if (tags.value.type === 'ArrayExpression') {
+        const tagsText = source.slice(tags.start, tags.end)
+        return eval(tagsText)
+      } else if (tags.value.type === 'Literal') {
+        return [tags.value.value]
+      }
     }
   }
 }
