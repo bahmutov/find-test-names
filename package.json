@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/bahmutov/find-test-names#readme",
   "dependencies": {
-    "acorn": "^8.5.0",
+    "@babel/parser": "^7.16.5",
     "acorn-walk": "^8.2.0",
     "simple-bin-help": "^1.7.6"
   },

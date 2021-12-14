@@ -1,4 +1,4 @@
-const acorn = require('acorn')
+const babel = require('@babel/parser')
 const walk = require('acorn-walk')
 
 const isDescribe = (node) =>
@@ -34,6 +34,11 @@ const extractTestName = (node) => {
   throw new Error(`Unsupported node type: ${node.type}`)
 }
 
+const plugins = [
+  'estree', // To generate estree compatible AST
+  'typescript',
+]
+
 /**
  * Returns all suite and test names found in the given JavaScript
  * source code (Mocha / Cypress syntax)
@@ -43,9 +48,15 @@ function getTestNames(source) {
   // should we pass the ecma version here?
   let AST
   try {
-    AST = acorn.parse(source, { ecmaVersion: 2022, sourceType: 'script' })
+    AST = babel.parse(source, {
+      plugins,
+      sourceType: 'script',
+    }).program
   } catch (e) {
-    AST = acorn.parse(source, { ecmaVersion: 2022, sourceType: 'module' })
+    AST = babel.parse(source, {
+      plugins,
+      sourceType: 'module',
+    }).program
   }
 
   const suiteNames = []
