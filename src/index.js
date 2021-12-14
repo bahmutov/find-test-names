@@ -1,5 +1,6 @@
 const babel = require('@babel/parser')
 const walk = require('acorn-walk')
+const debug = require('debug')('find-test-names')
 
 const isDescribe = (node) =>
   node.type === 'CallExpression' && node.callee.name === 'describe'
@@ -48,15 +49,19 @@ function getTestNames(source) {
   // should we pass the ecma version here?
   let AST
   try {
+    debug('parsing source as a script')
     AST = babel.parse(source, {
       plugins,
       sourceType: 'script',
     }).program
+    debug('success!')
   } catch (e) {
+    debug('parsing source as a module')
     AST = babel.parse(source, {
       plugins,
       sourceType: 'module',
     }).program
+    debug('success!')
   }
 
   const suiteNames = []

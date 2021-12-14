@@ -36,6 +36,10 @@ $ npx find-test-names <path to the spec file>
 # prints the describe and test names found in the spec file
 ```
 
+## Debugging
+
+Run with the environment variable `DEBUG=find-test-names` to see verbose logs
+
 ## Small print
 
 Author: Gleb Bahmutov &lt;gleb.bahmutov@gmail.com&gt; &copy; 2021

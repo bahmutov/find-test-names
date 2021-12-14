@@ -32,6 +32,7 @@
   "dependencies": {
     "@babel/parser": "^7.16.5",
     "acorn-walk": "^8.2.0",
+    "debug": "^4.3.3",
     "simple-bin-help": "^1.7.6"
   },
   "devDependencies": {
