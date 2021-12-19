@@ -40,6 +40,29 @@ const plugins = [
   'typescript',
 ]
 
+function ignore(_node, _st, _c) {}
+
+const base = walk.make({})
+
+/**
+ * The proxy ignores all AST nodes for which acorn has no base visitor, i.e. it does
+ * not traverse them further.
+ * This includes TypeScript specific nodes like TSInterfaceDeclaration,
+ * but also babel-specific nodes like ClassPrivateProperty.
+ *
+ * Since test suites are only built with CallExpressions, ignoring nodes should not affect
+ * the test name extraction.
+ */
+const proxy = new Proxy(base, {
+  get: function (target, prop) {
+    if (target[prop]) {
+      return Reflect.get(...arguments)
+    }
+
+    return ignore
+  },
+})
+
 /**
  * Returns all suite and test names found in the given JavaScript
  * source code (Mocha / Cypress syntax)
@@ -70,35 +93,39 @@ function getTestNames(source) {
   // each entry has name and possibly a list of tags
   const tests = []
 
-  walk.simple(AST, {
-    CallExpression(node) {
-      if (isDescribe(node)) {
-        const name = extractTestName(node.arguments[0])
-        const suiteInfo = {
-          name,
-        }
+  walk.simple(
+    AST,
+    {
+      CallExpression(node) {
+        if (isDescribe(node)) {
+          const name = extractTestName(node.arguments[0])
+          const suiteInfo = {
+            name,
+          }
 
-        const tags = getTags(source, node)
-        if (Array.isArray(tags) && tags.length > 0) {
-          suiteInfo.tags = tags
-        }
-        suiteNames.push(name)
-        tests.push(suiteInfo)
-      } else if (isIt(node)) {
-        const name = extractTestName(node.arguments[0])
-        const testInfo = {
-          name,
-        }
+          const tags = getTags(source, node)
+          if (Array.isArray(tags) && tags.length > 0) {
+            suiteInfo.tags = tags
+          }
+          suiteNames.push(name)
+          tests.push(suiteInfo)
+        } else if (isIt(node)) {
+          const name = extractTestName(node.arguments[0])
+          const testInfo = {
+            name,
+          }
 
-        const tags = getTags(source, node)
-        if (Array.isArray(tags) && tags.length > 0) {
-          testInfo.tags = tags
+          const tags = getTags(source, node)
+          if (Array.isArray(tags) && tags.length > 0) {
+            testInfo.tags = tags
+          }
+          testNames.push(name)
+          tests.push(testInfo)
         }
-        testNames.push(name)
-        tests.push(testInfo)
-      }
+      },
     },
-  })
+    proxy,
+  )
 
   const sortedSuiteNames = suiteNames.sort()
   const sortedTestNames = testNames.sort()
