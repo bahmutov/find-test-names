@@ -130,6 +130,10 @@ test('typescript class with field modifiers', (t) => {
       public bar = 'public'
 
       protected baz = 'protected'
+
+      public createSuite() {
+        it('loads', () => {})
+      }
     }
 
     describe('TypeScript spec', () => {
@@ -140,8 +144,11 @@ test('typescript class with field modifiers', (t) => {
 
   t.deepEqual(result, {
     suiteNames: ['TypeScript spec'],
-    testNames: ['works'],
+    testNames: ['loads', 'works'],
     tests: [
+      {
+        name: 'loads',
+      },
       {
         name: 'works',
       },

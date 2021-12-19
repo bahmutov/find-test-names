@@ -45,12 +45,11 @@ function ignore(_node, _st, _c) {}
 const base = walk.make({})
 
 /**
- * The proxy ignores all AST nodes for which acorn has no base visitor, i.e. it does
- * not traverse them further.
+ * The proxy ignores all AST nodes for which acorn has no base visitor.
  * This includes TypeScript specific nodes like TSInterfaceDeclaration,
  * but also babel-specific nodes like ClassPrivateProperty.
  *
- * Since test suites are only built with CallExpressions, ignoring nodes should not affect
+ * Since describe / it are CallExpressions, ignoring nodes should not affect
  * the test name extraction.
  */
 const proxy = new Proxy(base, {
