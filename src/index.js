@@ -5,6 +5,12 @@ const debug = require('debug')('find-test-names')
 const isDescribe = (node) =>
   node.type === 'CallExpression' && node.callee.name === 'describe'
 
+const isDescribeSkip = (node) =>
+  node.type === 'CallExpression' &&
+  node.callee.type === 'MemberExpression' &&
+  node.callee.object.name === 'describe' &&
+  node.callee.property.name === 'skip'
+
 const isIt = (node) =>
   node.type === 'CallExpression' && node.callee.name === 'it'
 
@@ -107,6 +113,20 @@ function getTestNames(source) {
           debug('found describe "%s"', name)
           const suiteInfo = {
             name,
+          }
+
+          const tags = getTags(source, node)
+          if (Array.isArray(tags) && tags.length > 0) {
+            suiteInfo.tags = tags
+          }
+          suiteNames.push(name)
+          tests.push(suiteInfo)
+        } else if (isDescribeSkip(node)) {
+          const name = extractTestName(node.arguments[0])
+          debug('found describe.skip "%s"', name)
+          const suiteInfo = {
+            name,
+            pending: true,
           }
 
           const tags = getTags(source, node)

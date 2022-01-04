@@ -47,6 +47,29 @@ test('skipped test', (t) => {
   })
 })
 
+test('skipped suite', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    describe.skip('foo', () => {
+      it('bar', () => {})
+    })
+  `
+  const result = getTestNames(source)
+  t.deepEqual(result, {
+    suiteNames: ['foo'],
+    testNames: ['bar'],
+    tests: [
+      {
+        name: 'bar',
+      },
+      {
+        name: 'foo',
+        pending: true,
+      },
+    ],
+  })
+})
+
 test('ES6 modules with import keyword', (t) => {
   t.plan(1)
   const source = stripIndent`
