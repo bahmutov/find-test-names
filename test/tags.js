@@ -48,6 +48,30 @@ test('test with tags', (t) => {
   })
 })
 
+test('skipped test with tags', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    describe('foo', () => {
+      it.skip('bar', {tags: ['@one']}, () => {})
+    })
+  `
+  const result = getTestNames(source)
+  t.deepEqual(result, {
+    suiteNames: ['foo'],
+    testNames: ['bar'],
+    tests: [
+      {
+        name: 'bar',
+        tags: ['@one'],
+        pending: true,
+      },
+      {
+        name: 'foo',
+      },
+    ],
+  })
+})
+
 test('describe with tags', (t) => {
   t.plan(1)
   const source = stripIndent`
