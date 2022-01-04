@@ -8,12 +8,14 @@
     "src"
   ],
   "bin": {
-    "find-test-names": "bin/find-test-names.js"
+    "find-test-names": "bin/find-test-names.js",
+    "update-test-count": "bin/update-test-count.js"
   },
   "scripts": {
     "test": "ava",
     "semantic-release": "semantic-release",
-    "demo": "DEBUG=find-test-names node bin/find-test-names.js demo/spec.js"
+    "demo": "DEBUG=find-test-names node bin/find-test-names.js demo/spec.js",
+    "demo-update-md": "DEBUG=find-test-names node bin/update-test-count.js out.md 'test-cy/**/*.js'"
   },
   "repository": {
     "type": "git",
@@ -34,11 +36,12 @@
     "@babel/parser": "^7.16.5",
     "acorn-walk": "^8.2.0",
     "debug": "^4.3.3",
+    "globby": "^11.0.4",
     "simple-bin-help": "^1.7.6"
   },
   "devDependencies": {
     "ava": "^3.15.0",
-    "common-tags": "^1.8.0",
+    "common-tags": "^1.8.2",
     "prettier": "^2.4.1",
     "semantic-release": "^18.0.0"
   }

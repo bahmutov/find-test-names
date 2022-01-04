@@ -16,9 +16,11 @@ test('basic', (t) => {
     tests: [
       {
         name: 'bar',
+        type: 'test',
       },
       {
         name: 'foo',
+        type: 'suite',
       },
     ],
   })
@@ -38,10 +40,12 @@ test('skipped test', (t) => {
     tests: [
       {
         name: 'bar',
+        type: 'test',
         pending: true,
       },
       {
         name: 'foo',
+        type: 'suite',
       },
     ],
   })
@@ -61,9 +65,11 @@ test('skipped suite', (t) => {
     tests: [
       {
         name: 'bar',
+        type: 'test',
       },
       {
         name: 'foo',
+        type: 'suite',
         pending: true,
       },
     ],
@@ -85,9 +91,11 @@ test('ES6 modules with import keyword', (t) => {
     tests: [
       {
         name: 'bar',
+        type: 'test',
       },
       {
         name: 'foo',
+        type: 'suite',
       },
     ],
   })

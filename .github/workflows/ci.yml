@@ -17,6 +17,9 @@ jobs:
       - name: Run bin file
         run: npm run demo
 
+      - name: Run update Markdown file
+        run: npm run demo-update-md
+
       - name: Semantic Release 🚀
         uses: cycjimmy/semantic-release-action@v2
         with:

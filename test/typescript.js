@@ -28,12 +28,15 @@ test('typescript annotation', (t) => {
     tests: [
       {
         name: 'works',
+        type: 'test',
       },
       {
         name: 'loads',
+        type: 'test',
       },
       {
         name: 'TypeScript spec',
+        type: 'suite',
       },
     ],
   })
@@ -58,9 +61,11 @@ test('typescript interface', (t) => {
     tests: [
       {
         name: 'works',
+        type: 'test',
       },
       {
         name: 'TypeScript spec',
+        type: 'suite',
       },
     ],
   })
@@ -85,9 +90,11 @@ test('typescript type', (t) => {
     tests: [
       {
         name: 'works',
+        type: 'test',
       },
       {
         name: 'TypeScript spec',
+        type: 'suite',
       },
     ],
   })
@@ -113,9 +120,11 @@ test('typescript enum', (t) => {
     tests: [
       {
         name: 'works',
+        type: 'test',
       },
       {
         name: 'TypeScript spec',
+        type: 'suite',
       },
     ],
   })
@@ -148,12 +157,15 @@ test('typescript class with field modifiers', (t) => {
     tests: [
       {
         name: 'loads',
+        type: 'test',
       },
       {
         name: 'works',
+        type: 'test',
       },
       {
         name: 'TypeScript spec',
+        type: 'suite',
       },
     ],
   })

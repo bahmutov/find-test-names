@@ -16,9 +16,11 @@ test('template literal test title', (t) => {
     tests: [
       {
         name: 'bar',
+        type: 'test',
       },
       {
         name: 'foo',
+        type: 'suite',
       },
     ],
   })
@@ -38,9 +40,11 @@ test('template literal suite title', (t) => {
     tests: [
       {
         name: 'bar',
+        type: 'test',
       },
       {
         name: 'foo',
+        type: 'suite',
       },
     ],
   })
@@ -62,9 +66,11 @@ test('template literal test title with variables', (t) => {
     tests: [
       {
         name: 'bar the end',
+        type: 'test',
       },
       {
         name: 'foo',
+        type: 'suite',
       },
     ],
   })

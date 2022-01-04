@@ -17,9 +17,11 @@ test('test with a single string tag', (t) => {
       {
         name: 'bar',
         tags: ['@one'],
+        type: 'test',
       },
       {
         name: 'foo',
+        type: 'suite',
       },
     ],
   })
@@ -40,9 +42,11 @@ test('test with tags', (t) => {
       {
         name: 'bar',
         tags: ['@one'],
+        type: 'test',
       },
       {
         name: 'foo',
+        type: 'suite',
       },
     ],
   })
@@ -63,10 +67,12 @@ test('skipped test with tags', (t) => {
       {
         name: 'bar',
         tags: ['@one'],
+        type: 'test',
         pending: true,
       },
       {
         name: 'foo',
+        type: 'suite',
       },
     ],
   })
@@ -86,10 +92,12 @@ test('describe with tags', (t) => {
     tests: [
       {
         name: 'bar',
+        type: 'test',
       },
       {
         name: 'foo',
         tags: ['@one', '@two'],
+        type: 'suite',
       },
     ],
   })
