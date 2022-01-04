@@ -98,6 +98,7 @@ function getTestNames(source) {
       CallExpression(node) {
         if (isDescribe(node)) {
           const name = extractTestName(node.arguments[0])
+          debug('found describe "%s"', name)
           const suiteInfo = {
             name,
           }
@@ -110,6 +111,7 @@ function getTestNames(source) {
           tests.push(suiteInfo)
         } else if (isIt(node)) {
           const name = extractTestName(node.arguments[0])
+          debug('found test "%s"', name)
           const testInfo = {
             name,
           }

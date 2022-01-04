@@ -12,7 +12,8 @@
   },
   "scripts": {
     "test": "ava",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "demo": "DEBUG=find-test-names node bin/find-test-names.js demo/spec.js"
   },
   "repository": {
     "type": "git",
