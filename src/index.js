@@ -113,6 +113,7 @@ function getTestNames(source) {
           debug('found describe "%s"', name)
           const suiteInfo = {
             name,
+            type: 'suite',
           }
 
           const tags = getTags(source, node)
@@ -126,6 +127,7 @@ function getTestNames(source) {
           debug('found describe.skip "%s"', name)
           const suiteInfo = {
             name,
+            type: 'suite',
             pending: true,
           }
 
@@ -139,6 +141,7 @@ function getTestNames(source) {
           const name = extractTestName(node.arguments[0])
           debug('found test "%s"', name)
           const testInfo = {
+            type: 'test',
             name,
           }
 
@@ -154,6 +157,7 @@ function getTestNames(source) {
 
           const testInfo = {
             name,
+            type: 'test',
             pending: true,
           }
 
