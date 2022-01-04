@@ -10,3 +10,5 @@ describe('parent suite', () => {
     it('loads', () => {})
   })
 })
+
+it.skip('pending test', () => {})

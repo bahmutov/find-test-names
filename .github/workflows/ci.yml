@@ -15,7 +15,7 @@ jobs:
         run: npm test
 
       - name: Run bin file
-        run: node ./bin/find-test-names demo/spec.js
+        run: npm run demo
 
       - name: Semantic Release 🚀
         uses: cycjimmy/semantic-release-action@v2

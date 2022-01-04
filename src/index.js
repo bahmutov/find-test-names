@@ -8,6 +8,12 @@ const isDescribe = (node) =>
 const isIt = (node) =>
   node.type === 'CallExpression' && node.callee.name === 'it'
 
+const isItSkip = (node) =>
+  node.type === 'CallExpression' &&
+  node.callee.type === 'MemberExpression' &&
+  node.callee.object.name === 'it' &&
+  node.callee.property.name === 'skip'
+
 const getTags = (source, node) => {
   if (node.arguments[1].type === 'ObjectExpression') {
     // extract any possible tags
@@ -122,7 +128,25 @@ function getTestNames(source) {
           }
           testNames.push(name)
           tests.push(testInfo)
+        } else if (isItSkip(node)) {
+          const name = extractTestName(node.arguments[0])
+          debug('found it.skip "%s"', name)
+
+          const testInfo = {
+            name,
+            pending: true,
+          }
+
+          const tags = getTags(source, node)
+          if (Array.isArray(tags) && tags.length > 0) {
+            testInfo.tags = tags
+          }
+          testNames.push(name)
+          tests.push(testInfo)
         }
+        //  else {
+        //   console.log(node)
+        // }
       },
     },
     proxy,
