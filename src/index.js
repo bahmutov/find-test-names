@@ -203,6 +203,57 @@ const getSuiteAncestorsForTest = (test, source, ancestors, nodes) => {
 }
 
 /**
+ * This function is used to find (nested) empty describes.
+ *
+ * Loops over the ancestor nodes of a describe / describe.skip node
+ * and return a tree of unknown suites.
+ *
+ * It uses the same nodes cache as getSuiteAncestorsForTest to make sure
+ * no suites are added twice / no unnecessary nodes are walked.
+ */
+const getOrphanSuiteAncestorsForSuite = (ancestors, source, nodes) => {
+  let prevSuite
+  let knownNode = false
+
+  for (var i = ancestors.length - 1; i >= 0; i--) {
+    // in the first iteration the ancestor is identical to the node
+    const ancestor = ancestors[i]
+
+    const describe = isDescribe(ancestor)
+    const skip = isDescribeSkip(ancestor)
+
+    if (describe || skip) {
+      if (nodes.has(ancestor.callee)) {
+        // Reached an already known suite
+        knownNode = true
+        if (prevSuite) {
+          // Add new child suite to suite
+          nodes.get(ancestor.callee).suites.push(prevSuite)
+        }
+        break
+      }
+
+      const { suite } = getDescribe(ancestor, source, skip)
+
+      if (prevSuite) {
+        suite.suites.push(prevSuite)
+      }
+
+      nodes.set(ancestor.callee, suite)
+
+      prevSuite = suite
+    }
+  }
+
+  if (!knownNode) {
+    // walked tree to the top and found new suite(s)
+    return prevSuite
+  }
+
+  return null
+}
+
+/**
  * Returns all suite and test names found in the given JavaScript
  * source code (Mocha / Cypress syntax)
  * @param {string} source
@@ -247,12 +298,32 @@ function getTestNames(source, withStructure) {
 
           debug('found describe "%s"', suiteInfo.name)
 
+          const suite = getOrphanSuiteAncestorsForSuite(
+            ancestors,
+            source,
+            nodes,
+          )
+
+          if (suite) {
+            structure.push(suite)
+          }
+
           suiteNames.push(suiteInfo.name)
           tests.push(suiteInfo)
         } else if (isDescribeSkip(node)) {
           const { suiteInfo } = getDescribe(node, source, true)
 
           debug('found describe.skip "%s"', suiteInfo.name)
+
+          const suite = getOrphanSuiteAncestorsForSuite(
+            ancestors,
+            source,
+            nodes,
+          )
+
+          if (suite) {
+            structure.push(suite)
+          }
 
           suiteNames.push(suiteInfo.name)
           tests.push(suiteInfo)
