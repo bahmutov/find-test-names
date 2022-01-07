@@ -74,6 +74,44 @@ const proxy = new Proxy(base, {
   },
 })
 
+const getDescribe = (node, source, pending = false) => {
+  const name = extractTestName(node.arguments[0])
+  const suiteInfo = {
+    name,
+    type: 'suite',
+  }
+
+  if (pending) {
+    suiteInfo.pending = true
+  }
+
+  const tags = getTags(source, node)
+  if (Array.isArray(tags) && tags.length > 0) {
+    suiteInfo.tags = tags
+  }
+
+  return { suiteInfo }
+}
+
+const getIt = (node, source, pending = false) => {
+  const name = extractTestName(node.arguments[0])
+  const testInfo = {
+    name,
+    type: 'test',
+  }
+
+  if (pending) {
+    testInfo.pending = true
+  }
+
+  const tags = getTags(source, node)
+  if (Array.isArray(tags) && tags.length > 0) {
+    testInfo.tags = tags
+  }
+
+  return { testInfo }
+}
+
 /**
  * Returns all suite and test names found in the given JavaScript
  * source code (Mocha / Cypress syntax)
@@ -109,68 +147,33 @@ function getTestNames(source) {
     {
       CallExpression(node) {
         if (isDescribe(node)) {
-          const name = extractTestName(node.arguments[0])
-          debug('found describe "%s"', name)
-          const suiteInfo = {
-            name,
-            type: 'suite',
-          }
+          const { suiteInfo } = getDescribe(node, source)
 
-          const tags = getTags(source, node)
-          if (Array.isArray(tags) && tags.length > 0) {
-            suiteInfo.tags = tags
-          }
-          suiteNames.push(name)
+          debug('found describe "%s"', suiteInfo.name)
+
+          suiteNames.push(suiteInfo.name)
           tests.push(suiteInfo)
         } else if (isDescribeSkip(node)) {
-          const name = extractTestName(node.arguments[0])
-          debug('found describe.skip "%s"', name)
-          const suiteInfo = {
-            name,
-            type: 'suite',
-            pending: true,
-          }
+          const { suiteInfo } = getDescribe(node, source, true)
 
-          const tags = getTags(source, node)
-          if (Array.isArray(tags) && tags.length > 0) {
-            suiteInfo.tags = tags
-          }
-          suiteNames.push(name)
+          debug('found describe.skip "%s"', suiteInfo.name)
+
+          suiteNames.push(suiteInfo.name)
           tests.push(suiteInfo)
         } else if (isIt(node)) {
-          const name = extractTestName(node.arguments[0])
-          debug('found test "%s"', name)
-          const testInfo = {
-            type: 'test',
-            name,
-          }
+          const { testInfo } = getIt(node, source)
 
-          const tags = getTags(source, node)
-          if (Array.isArray(tags) && tags.length > 0) {
-            testInfo.tags = tags
-          }
-          testNames.push(name)
+          debug('found test "%s"', testInfo.name)
+
+          testNames.push(testInfo.name)
           tests.push(testInfo)
         } else if (isItSkip(node)) {
-          const name = extractTestName(node.arguments[0])
-          debug('found it.skip "%s"', name)
+          const { testInfo } = getIt(node, source, true)
+          debug('found it.skip "%s"', testInfo.name)
 
-          const testInfo = {
-            name,
-            type: 'test',
-            pending: true,
-          }
-
-          const tags = getTags(source, node)
-          if (Array.isArray(tags) && tags.length > 0) {
-            testInfo.tags = tags
-          }
-          testNames.push(name)
+          testNames.push(testInfo.name)
           tests.push(testInfo)
         }
-        //  else {
-        //   console.log(node)
-        // }
       },
     },
     proxy,
