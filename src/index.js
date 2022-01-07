@@ -90,7 +90,16 @@ const getDescribe = (node, source, pending = false) => {
     suiteInfo.tags = tags
   }
 
-  return { suiteInfo }
+  const suite = {
+    name,
+    tags: suiteInfo.tags,
+    pending,
+    type: 'suite',
+    tests: [],
+    suites: [],
+  }
+
+  return { suiteInfo, suite }
 }
 
 const getIt = (node, source, pending = false) => {
@@ -109,7 +118,88 @@ const getIt = (node, source, pending = false) => {
     testInfo.tags = tags
   }
 
-  return { testInfo }
+  const test = {
+    name,
+    tags: testInfo.tags,
+    pending,
+    type: 'test',
+  }
+
+  return { testInfo, test }
+}
+
+/**
+ * This function returns a tree structure which contains the test and all of its new suite parents.
+ *
+ * Loops over the ancestor nodes of a it / it.skip node
+ * until it finds an already known suite node or the top of the tree.
+ *
+ * It uses a suite cache by node to make sure
+ * subsequently found tests will stop traversing at already known suites.
+ *
+ * Technical details:
+ *   acorn-walk does depth first traversal,
+ *   i.e. walk.ancestor is called with the deepest node first, usually an "it",
+ *   and a list of its ancestors. (other AST walkers travserse from the top)
+ *
+ *   Since the tree generation starts from it nodes, this function cannot find
+ *   suites without tests.
+ *   This is handled by getOrphanSuiteAncestorsForSuite
+ *
+ */
+const getSuiteAncestorsForTest = (test, source, ancestors, nodes) => {
+  let knownNode = false
+  let prevSuite
+  let describeFound = false
+
+  for (var i = ancestors.length - 1; i >= 0; i--) {
+    const node = ancestors[i]
+    const describe = isDescribe(node)
+    const skip = isDescribeSkip(node)
+
+    if (describe || skip) {
+      let suite
+
+      knownNode = nodes.has(node.callee)
+
+      if (knownNode) {
+        suite = nodes.get(node.callee)
+      } else {
+        const result = getDescribe(node, source, skip)
+        suite = result.suite
+        nodes.set(node.callee, suite)
+      }
+
+      if (prevSuite) {
+        suite.suites.push(prevSuite)
+      }
+
+      if (!describeFound) {
+        // found this test's describe
+        suite.tests.push(test)
+
+        describeFound = true
+      }
+
+      if (knownNode) {
+        break
+      }
+
+      prevSuite = suite
+    }
+  }
+
+  if (!knownNode) {
+    // walked tree to the top
+    if (describeFound) {
+      return prevSuite
+    } else {
+      // top level test
+      return test
+    }
+  }
+
+  return null
 }
 
 /**
@@ -117,7 +207,7 @@ const getIt = (node, source, pending = false) => {
  * source code (Mocha / Cypress syntax)
  * @param {string} source
  */
-function getTestNames(source) {
+function getTestNames(source, withStructure) {
   // should we pass the ecma version here?
   let AST
   try {
@@ -142,10 +232,16 @@ function getTestNames(source) {
   // each entry has name and possibly a list of tags
   const tests = []
 
-  walk.simple(
+  // Map of known nodes keyed: callee => value: suite
+  let nodes = new Map()
+
+  // Tree of describes and tests
+  let structure = []
+
+  walk.ancestor(
     AST,
     {
-      CallExpression(node) {
+      CallExpression(node, ancestors) {
         if (isDescribe(node)) {
           const { suiteInfo } = getDescribe(node, source)
 
@@ -161,15 +257,37 @@ function getTestNames(source) {
           suiteNames.push(suiteInfo.name)
           tests.push(suiteInfo)
         } else if (isIt(node)) {
-          const { testInfo } = getIt(node, source)
+          const { testInfo, test } = getIt(node, source)
 
           debug('found test "%s"', testInfo.name)
+
+          const suiteOrTest = getSuiteAncestorsForTest(
+            test,
+            source,
+            ancestors,
+            nodes,
+          )
+
+          if (suiteOrTest) {
+            structure.push(suiteOrTest)
+          }
 
           testNames.push(testInfo.name)
           tests.push(testInfo)
         } else if (isItSkip(node)) {
-          const { testInfo } = getIt(node, source, true)
+          const { testInfo, test } = getIt(node, source, true)
           debug('found it.skip "%s"', testInfo.name)
+
+          const suiteOrTest = getSuiteAncestorsForTest(
+            test,
+            source,
+            ancestors,
+            nodes,
+          )
+
+          if (suiteOrTest) {
+            structure.push(suiteOrTest)
+          }
 
           testNames.push(testInfo.name)
           tests.push(testInfo)
@@ -181,11 +299,17 @@ function getTestNames(source) {
 
   const sortedSuiteNames = suiteNames.sort()
   const sortedTestNames = testNames.sort()
-  return {
+  const result = {
     suiteNames: sortedSuiteNames,
     testNames: sortedTestNames,
     tests,
   }
+
+  if (withStructure) {
+    result.structure = structure
+  }
+
+  return result
 }
 
 module.exports = {
