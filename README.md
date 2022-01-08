@@ -52,6 +52,30 @@ $ npx find-test-names <path to the spec file>
 # prints the describe and test names found in the spec file
 ```
 
+### print-tests
+
+Print found suites an tests
+
+```shell
+$ npx print-tests <spec pattern>
+```
+
+For example, in this repo
+
+```
+$ npx print-tests 'test-cy/**/*.js'
+
+test-cy/spec-a.js
+└─ Suite A
+  ├─ works 1
+  └─ works 2
+
+test-cy/spec-b.js
+└─ Suite B
+  ├─ works 1
+  └─ works 2
+```
+
 ## Debugging
 
 Run with the environment variable `DEBUG=find-test-names` to see verbose logs
