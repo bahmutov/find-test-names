@@ -76,6 +76,14 @@ test-cy/spec-b.js
   └─ works 2
 ```
 
+Pending tests and suites are marked with `⊙` character like this:
+
+```
+├─ first
+├⊙ second
+└⊙ last
+```
+
 ## Debugging
 
 Run with the environment variable `DEBUG=find-test-names` to see verbose logs

@@ -219,3 +219,53 @@ test('no tests with indent 2', (t) => {
   const s = formatTestList(tests, 2)
   t.deepEqual(s, '    └─ (empty)')
 })
+
+test('pending test', (t) => {
+  t.plan(1)
+  const tests = [
+    {
+      name: 'first',
+    },
+    {
+      name: 'second',
+      pending: true,
+    },
+    {
+      name: 'last',
+      pending: true,
+    },
+  ]
+  const s = formatTestList(tests)
+  t.deepEqual(
+    s,
+    stripIndent`
+      ├─ first
+      ├⊙ second
+      └⊙ last
+    `,
+  )
+})
+
+test('pending suite', (t) => {
+  t.plan(1)
+  const tests = [
+    {
+      name: 'pending suite',
+      type: 'suite',
+      pending: true,
+      tests: [
+        {
+          name: 'a test',
+        },
+      ],
+    },
+  ]
+  const s = formatTestList(tests)
+  t.deepEqual(
+    s,
+    stripIndent`
+      └⊙ pending suite
+        └─ a test
+    `,
+  )
+})

@@ -3,6 +3,8 @@ const spacer = '  '
 const spacerNeighbour = '│ '
 const lastSpacer = '└─ '
 const middleSpacer = '├─ '
+const pendingLastSpacer = '└⊙ '
+const pendingMiddleSpacer = '├⊙ '
 
 function formatTestList(tests, indent = 0) {
   const myIndent = spacer.repeat(indent)
@@ -14,9 +16,9 @@ function formatTestList(tests, indent = 0) {
   const lines = tests.map((test, k) => {
     let start
     if (k === lastIndex) {
-      start = lastSpacer
+      start = test.pending ? pendingLastSpacer : lastSpacer
     } else {
-      start = middleSpacer
+      start = test.pending ? pendingMiddleSpacer : middleSpacer
     }
 
     if (test.type === 'suite') {
