@@ -2,6 +2,48 @@ const { stripIndent } = require('common-tags')
 const test = require('ava')
 const { getTestNames } = require('../src')
 
+test('handles empty string', (t) => {
+  t.plan(1)
+  const source = ''
+  const result = getTestNames(source, true)
+
+  t.deepEqual(result.structure, [])
+})
+
+test('handles pending test', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    it('will be added later')
+  `
+  const result = getTestNames(source, true)
+
+  t.deepEqual(result.structure, [
+    {
+      name: 'will be added later',
+      pending: true,
+      tags: undefined,
+      type: 'test',
+    },
+  ])
+})
+
+test('handles a single test', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    it('works', () => {})
+  `
+  const result = getTestNames(source, true)
+
+  t.deepEqual(result.structure, [
+    {
+      name: 'works',
+      pending: false,
+      tags: undefined,
+      type: 'test',
+    },
+  ])
+})
+
 test('extract complex structure', (t) => {
   t.plan(1)
   const source = stripIndent`

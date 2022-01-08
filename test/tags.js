@@ -18,6 +18,7 @@ test('test with a single string tag', (t) => {
         name: 'bar',
         tags: ['@one'],
         type: 'test',
+        pending: false,
       },
       {
         name: 'foo',
@@ -43,6 +44,7 @@ test('test with tags', (t) => {
         name: 'bar',
         tags: ['@one'],
         type: 'test',
+        pending: false,
       },
       {
         name: 'foo',
@@ -93,6 +95,7 @@ test('describe with tags', (t) => {
       {
         name: 'bar',
         type: 'test',
+        pending: false,
       },
       {
         name: 'foo',

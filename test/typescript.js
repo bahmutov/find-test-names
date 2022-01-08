@@ -29,10 +29,12 @@ test('typescript annotation', (t) => {
       {
         name: 'works',
         type: 'test',
+        pending: false,
       },
       {
         name: 'loads',
         type: 'test',
+        pending: false,
       },
       {
         name: 'TypeScript spec',
@@ -62,6 +64,7 @@ test('typescript interface', (t) => {
       {
         name: 'works',
         type: 'test',
+        pending: false,
       },
       {
         name: 'TypeScript spec',
@@ -91,6 +94,7 @@ test('typescript type', (t) => {
       {
         name: 'works',
         type: 'test',
+        pending: false,
       },
       {
         name: 'TypeScript spec',
@@ -121,6 +125,7 @@ test('typescript enum', (t) => {
       {
         name: 'works',
         type: 'test',
+        pending: false,
       },
       {
         name: 'TypeScript spec',
@@ -158,10 +163,38 @@ test('typescript class with field modifiers', (t) => {
       {
         name: 'loads',
         type: 'test',
+        pending: false,
       },
       {
         name: 'works',
         type: 'test',
+        pending: false,
+      },
+      {
+        name: 'TypeScript spec',
+        type: 'suite',
+      },
+    ],
+  })
+})
+
+test('typescript pending test', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    describe('TypeScript spec', () => {
+      it('needs to be added')
+    })
+  `
+  const result = getTestNames(source)
+
+  t.deepEqual(result, {
+    suiteNames: ['TypeScript spec'],
+    testNames: ['needs to be added'],
+    tests: [
+      {
+        name: 'needs to be added',
+        type: 'test',
+        pending: true,
       },
       {
         name: 'TypeScript spec',

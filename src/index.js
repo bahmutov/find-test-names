@@ -21,6 +21,11 @@ const isItSkip = (node) =>
   node.callee.property.name === 'skip'
 
 const getTags = (source, node) => {
+  if (node.arguments.length < 2) {
+    // pending tests don't have tags
+    return
+  }
+
   if (node.arguments[1].type === 'ObjectExpression') {
     // extract any possible tags
     const tags = node.arguments[1].properties.find((node) => {
@@ -107,10 +112,15 @@ const getIt = (node, source, pending = false) => {
   const testInfo = {
     name,
     type: 'test',
+    pending,
   }
 
-  if (pending) {
-    testInfo.pending = true
+  if (!pending) {
+    // the test might be pending by the virtue of only having the name
+    // example: it("is pending")
+    if (node.arguments.length === 1) {
+      testInfo.pending = true
+    }
   }
 
   const tags = getTags(source, node)
@@ -121,7 +131,7 @@ const getIt = (node, source, pending = false) => {
   const test = {
     name,
     tags: testInfo.tags,
-    pending,
+    pending: testInfo.pending,
     type: 'test',
   }
 

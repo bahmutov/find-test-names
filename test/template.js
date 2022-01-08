@@ -17,6 +17,7 @@ test('template literal test title', (t) => {
       {
         name: 'bar',
         type: 'test',
+        pending: false,
       },
       {
         name: 'foo',
@@ -41,6 +42,7 @@ test('template literal suite title', (t) => {
       {
         name: 'bar',
         type: 'test',
+        pending: false,
       },
       {
         name: 'foo',
@@ -67,6 +69,7 @@ test('template literal test title with variables', (t) => {
       {
         name: 'bar the end',
         type: 'test',
+        pending: false,
       },
       {
         name: 'foo',

@@ -17,6 +17,7 @@ test('basic', (t) => {
       {
         name: 'bar',
         type: 'test',
+        pending: false,
       },
       {
         name: 'foo',
@@ -66,6 +67,7 @@ test('skipped suite', (t) => {
       {
         name: 'bar',
         type: 'test',
+        pending: false,
       },
       {
         name: 'foo',
@@ -92,6 +94,7 @@ test('ES6 modules with import keyword', (t) => {
       {
         name: 'bar',
         type: 'test',
+        pending: false,
       },
       {
         name: 'foo',
