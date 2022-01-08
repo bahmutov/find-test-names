@@ -57,6 +57,143 @@ test('suite with tests', (t) => {
   )
 })
 
+test('two suites', (t) => {
+  t.plan(1)
+  const tests = [
+    {
+      name: 'suite A',
+      type: 'suite',
+      tests: [
+        {
+          name: 'first',
+        },
+        {
+          name: 'second',
+        },
+        {
+          name: 'last',
+        },
+      ],
+    },
+    {
+      name: 'suite B',
+      type: 'suite',
+      tests: [
+        {
+          name: 'first',
+        },
+        {
+          name: 'second',
+        },
+        {
+          name: 'last',
+        },
+      ],
+    },
+  ]
+  const s = formatTestList(tests)
+  t.deepEqual(
+    s,
+    stripIndent`
+      ├─ suite A
+        ├─ first
+        ├─ second
+        └─ last
+      └─ suite B
+        ├─ first
+        ├─ second
+        └─ last
+    `,
+  )
+})
+
+test('nested suites', (t) => {
+  t.plan(1)
+  const tests = [
+    {
+      name: 'suite A',
+      type: 'suite',
+      tests: [
+        {
+          name: 'first',
+        },
+        {
+          name: 'second',
+        },
+        {
+          name: 'suite B',
+          type: 'suite',
+          tests: [
+            {
+              name: 'test a',
+            },
+            {
+              name: 'test b',
+            },
+          ],
+        },
+        {
+          name: 'last',
+        },
+      ],
+    },
+  ]
+  const s = formatTestList(tests)
+  t.deepEqual(
+    s,
+    stripIndent`
+      └─ suite A
+        ├─ first
+        ├─ second
+        ├─ suite B
+          ├─ test a
+          └─ test b
+        └─ last
+    `,
+  )
+})
+
+test('three suites', (t) => {
+  t.plan(1)
+  const tests = [
+    {
+      name: 'suite A',
+      type: 'suite',
+      tests: [
+        {
+          name: 'suite B',
+          type: 'suite',
+          tests: [
+            {
+              name: 'suite C',
+              type: 'suite',
+              tests: [
+                {
+                  name: 'test a',
+                },
+                {
+                  name: 'test b',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ]
+  const s = formatTestList(tests)
+  t.deepEqual(
+    s,
+    stripIndent`
+      └─ suite A
+        └─ suite B
+          └─ suite C
+            ├─ test a
+            └─ test b
+    `,
+  )
+})
+
 test('no tests', (t) => {
   t.plan(1)
   const tests = []

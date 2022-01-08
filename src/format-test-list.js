@@ -6,31 +6,30 @@ const middleSpacer = '├─ '
 
 function formatTestList(tests, indent = 0) {
   const myIndent = spacer.repeat(indent)
-  const innerIndent = myIndent + spacer
   const lastIndex = tests.length - 1
   if (!tests.length) {
     return `${myIndent}└─ (empty)`
   }
 
   const lines = tests.map((test, k) => {
-    let spacer
+    let start
     if (k === lastIndex) {
-      spacer = lastSpacer
+      start = lastSpacer
     } else {
-      spacer = middleSpacer
+      start = middleSpacer
     }
 
     if (test.type === 'suite') {
       const nested = formatTestList(test.tests || [], indent + 1)
       const nestedLines = nested.split('\n')
       const nestedLinesWithIndent = nestedLines.map((s) => {
-        return innerIndent + s
+        return spacer + s
       })
       const suiteLines =
-        `${spacer}${test.name}` + '\n' + nestedLinesWithIndent.join('\n')
+        `${start}${test.name}` + '\n' + nestedLinesWithIndent.join('\n')
       return suiteLines
     } else {
-      return `${spacer}${test.name}`
+      return `${start}${test.name}`
     }
   })
 
