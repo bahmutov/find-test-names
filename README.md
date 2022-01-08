@@ -84,6 +84,14 @@ Pending tests and suites are marked with `⊙` character like this:
 └⊙ last
 ```
 
+If there are tags, they are shown after the name
+
+```
+├─ first [tag1, tag2]
+├─ second [@sanity]
+└─ last
+```
+
 ## Debugging
 
 Run with the environment variable `DEBUG=find-test-names` to see verbose logs

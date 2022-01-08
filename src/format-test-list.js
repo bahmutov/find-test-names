@@ -21,17 +21,21 @@ function formatTestList(tests, indent = 0) {
       start = test.pending ? pendingMiddleSpacer : middleSpacer
     }
 
+    let nameLine = `${start}${test.name}`
+    if (Array.isArray(test.tags)) {
+      nameLine += ` [${test.tags.join(', ')}]`
+    }
+
     if (test.type === 'suite') {
       const nested = formatTestList(test.tests || [], indent + 1)
       const nestedLines = nested.split('\n')
       const nestedLinesWithIndent = nestedLines.map((s) => {
         return spacer + s
       })
-      const suiteLines =
-        `${start}${test.name}` + '\n' + nestedLinesWithIndent.join('\n')
+      const suiteLines = `${nameLine}` + '\n' + nestedLinesWithIndent.join('\n')
       return suiteLines
     } else {
-      return `${start}${test.name}`
+      return nameLine
     }
   })
 
