@@ -9,14 +9,15 @@
   ],
   "bin": {
     "find-test-names": "bin/find-test-names.js",
-    "update-test-count": "bin/update-test-count.js"
+    "update-test-count": "bin/update-test-count.js",
+    "print-tests": "bin/print-tests.js"
   },
   "scripts": {
     "test": "ava",
     "semantic-release": "semantic-release",
     "demo": "DEBUG=find-test-names node bin/find-test-names.js demo/spec.js",
     "demo-update-md": "DEBUG=find-test-names node bin/update-test-count.js out.md 'test-cy/**/*.js'",
-    "demo-structure": "node bin/find-tests.js 'test-cy/**/*.js'"
+    "demo-print": "node bin/print-tests.js 'test-cy/**/*.js'"
   },
   "repository": {
     "type": "git",
