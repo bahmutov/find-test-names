@@ -28,6 +28,17 @@ it('works', {tags: ['@user']}, () => { ... })
 // { tests: [{ name: 'works', tags: ['@user'] }] }
 ```
 
+### withStructure
+
+You can get the entire structure of suites and tests by passing `true` argument
+
+```js
+const result = getTestNames(specSourceCode, true)
+// use the result.structure array
+```
+
+To view this in action, use `npm run demo-structure` which points at [bin/find-tests.js](./bin/find-tests.js)
+
 ### Pending tests
 
 The tests `it.skip` are extracted and have the property `pending: true`

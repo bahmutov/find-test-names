@@ -6,13 +6,12 @@ const globby = require('globby')
 const debug = require('debug')('find-test-names')
 
 require('simple-bin-help')({
-  minArguments: 4,
+  minArguments: 3,
   packagePath: path.join(__dirname, '..', 'package.json'),
-  help: "use: npx update-test-count filename.md 'file pattern'",
+  help: "use: npx find-tests 'spec file pattern'",
 })
 
-const filename = process.argv[2]
-const pattern = process.argv[3]
+const pattern = process.argv[2]
 debug('using pattern "%s"', pattern)
 
 const filenames = globby.sync(pattern)
@@ -24,13 +23,14 @@ const { getTestNames } = require('../src')
 const allTests = []
 filenames.forEach((filename) => {
   const source = fs.readFileSync(filename, 'utf8')
-  const result = getTestNames(source)
-  console.log(result)
+  const result = getTestNames(source, true)
+  console.log('=== %s ===', filename)
+  console.log(JSON.stringify(result.structure, null, 2))
   allTests.push(...result.tests)
 })
 
-debug('found %d tests', allTests.length)
-debug(allTests)
+// debug('found %d tests', allTests.length)
+// debug(allTests)
 
 // console.log('describe names:', result.suiteNames.join(', '))
 // console.log('test names:', result.testNames.join(', '))

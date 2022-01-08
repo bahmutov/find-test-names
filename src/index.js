@@ -267,6 +267,7 @@ const getOrphanSuiteAncestorsForSuite = (ancestors, source, nodes) => {
  * Returns all suite and test names found in the given JavaScript
  * source code (Mocha / Cypress syntax)
  * @param {string} source
+ * @param {boolean} withStructure - return nested structure of suites and tests
  */
 function getTestNames(source, withStructure) {
   // should we pass the ecma version here?
