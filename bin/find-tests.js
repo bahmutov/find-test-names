@@ -25,7 +25,11 @@ filenames.forEach((filename) => {
   const source = fs.readFileSync(filename, 'utf8')
   const result = getTestNames(source, true)
   console.log('=== %s ===', filename)
-  console.log(JSON.stringify(result.structure, null, 2))
+  // console.log(JSON.stringify(result.structure, null, 2))
+  console.dir(result.structure, { depth: 5 })
+  // console.log('%j', result.structure)
+  // const s = treeify(result.structure)
+  // console.log(s)
   allTests.push(...result.tests)
 })
 
