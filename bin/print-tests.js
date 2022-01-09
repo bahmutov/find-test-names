@@ -4,8 +4,7 @@ const path = require('path')
 const fs = require('fs')
 const globby = require('globby')
 const debug = require('debug')('find-test-names')
-const { getTestNames } = require('../src')
-const { formatTestList } = require('../src/format-test-list')
+const { getTestNames, formatTestList } = require('..')
 
 require('simple-bin-help')({
   minArguments: 3,

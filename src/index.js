@@ -1,6 +1,7 @@
 const babel = require('@babel/parser')
 const walk = require('acorn-walk')
 const debug = require('debug')('find-test-names')
+const { formatTestList } = require('./format-test-list')
 
 const isDescribe = (node) =>
   node.type === 'CallExpression' && node.callee.name === 'describe'
@@ -396,4 +397,5 @@ function getTestNames(source, withStructure) {
 
 module.exports = {
   getTestNames,
+  formatTestList,
 }
