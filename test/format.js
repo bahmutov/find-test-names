@@ -269,3 +269,44 @@ test('pending suite', (t) => {
     `,
   )
 })
+
+// https://github.com/bahmutov/find-test-names/issues/15
+test('inner suite', (t) => {
+  t.plan(1)
+  const tests = [
+    {
+      name: 'parent suite',
+      tags: ['@main'],
+      pending: false,
+      type: 'suite',
+      tests: [{ name: 'works', tags: undefined, pending: false, type: 'test' }],
+      suites: [
+        {
+          name: 'inner suite',
+          tags: undefined,
+          pending: false,
+          type: 'suite',
+          tests: [
+            {
+              name: 'shows something',
+              tags: ['@user'],
+              pending: false,
+              type: 'test',
+            },
+          ],
+          suites: [],
+        },
+      ],
+    },
+  ]
+  const s = formatTestList(tests)
+  t.deepEqual(
+    s,
+    stripIndent`
+    └─ parent suite [@main]
+      ├─ works
+      └─ inner suite
+        └─ shows something [@user]
+    `,
+  )
+})

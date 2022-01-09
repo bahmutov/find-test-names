@@ -27,11 +27,13 @@ function formatTestList(tests, indent = 0) {
     }
 
     if (test.type === 'suite') {
-      const nested = formatTestList(test.tests || [], indent + 1)
+      const children = [].concat(test.tests, test.suites).filter(Boolean)
+      const nested = formatTestList(children, indent + 1)
       const nestedLines = nested.split('\n')
       const nestedLinesWithIndent = nestedLines.map((s) => {
         return spacer + s
       })
+
       const suiteLines = `${nameLine}` + '\n' + nestedLinesWithIndent.join('\n')
       return suiteLines
     } else {
