@@ -96,9 +96,9 @@ test('two suites', (t) => {
     s,
     stripIndent`
       ├─ suite A
-        ├─ first
-        ├─ second
-        └─ last
+      │ ├─ first
+      │ ├─ second
+      │ └─ last
       └─ suite B
         ├─ first
         ├─ second
@@ -146,8 +146,8 @@ test('nested suites', (t) => {
         ├─ first
         ├─ second
         ├─ suite B
-          ├─ test a
-          └─ test b
+        │ ├─ test a
+        │ └─ test b
         └─ last
     `,
   )
@@ -344,7 +344,7 @@ test('vertical bars', (t) => {
       └─ suite A
         ├─ works
         ├─ inner one
-            └─ (empty)
+        │   └─ (empty)
         └─ inner two
             └─ (empty)
     `,

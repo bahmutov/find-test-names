@@ -12,6 +12,7 @@ function formatTestList(tests, indent = 0) {
     return `${spacer.repeat(indent > 0 ? indent - 1 : 0)}└─ (empty)`
   }
 
+  const testsN = tests.length
   const lines = tests.map((test, k) => {
     let start
     if (k === lastIndex) {
@@ -29,8 +30,9 @@ function formatTestList(tests, indent = 0) {
       const children = [].concat(test.tests, test.suites).filter(Boolean)
       const nested = formatTestList(children, indent + 1)
       const nestedLines = nested.split('\n')
+      const includeSpacer = k < testsN - 1 ? spacerNeighbour : spacer
       const nestedLinesWithIndent = nestedLines.map((s) => {
-        return spacer + s
+        return includeSpacer + s
       })
 
       const suiteLines = `${nameLine}` + '\n' + nestedLinesWithIndent.join('\n')
