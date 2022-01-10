@@ -43,7 +43,7 @@ test('suite with tags', (t) => {
     s,
     stripIndent`
       └─ parent suite [@user]
-          └─ (empty)
+        └─ (empty)
     `,
   )
 })

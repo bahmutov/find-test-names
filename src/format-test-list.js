@@ -7,10 +7,9 @@ const pendingLastSpacer = '└⊙ '
 const pendingMiddleSpacer = '├⊙ '
 
 function formatTestList(tests, indent = 0) {
-  const myIndent = spacer.repeat(indent)
   const lastIndex = tests.length - 1
   if (!tests.length) {
-    return `${myIndent}└─ (empty)`
+    return `${spacer.repeat(indent > 0 ? indent - 1 : 0)}└─ (empty)`
   }
 
   const lines = tests.map((test, k) => {

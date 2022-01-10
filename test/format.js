@@ -210,14 +210,14 @@ test('no tests with indent 1', (t) => {
   t.plan(1)
   const tests = []
   const s = formatTestList(tests, 1)
-  t.deepEqual(s, '  └─ (empty)')
+  t.deepEqual(s, '└─ (empty)')
 })
 
 test('no tests with indent 2', (t) => {
   t.plan(1)
   const tests = []
   const s = formatTestList(tests, 2)
-  t.deepEqual(s, '    └─ (empty)')
+  t.deepEqual(s, '  └─ (empty)')
 })
 
 test('pending test', (t) => {
@@ -307,6 +307,46 @@ test('inner suite', (t) => {
       ├─ works
       └─ inner suite
         └─ shows something [@user]
+    `,
+  )
+})
+
+// https://github.com/bahmutov/find-test-names/issues/18
+test('vertical bars', (t) => {
+  t.plan(1)
+  const tests = [
+    {
+      name: 'suite A',
+      type: 'suite',
+      suites: [
+        {
+          name: 'inner one',
+          type: 'suite',
+        },
+        {
+          name: 'inner two',
+          type: 'suite',
+        },
+      ],
+      tests: [
+        {
+          name: 'works',
+          type: 'test',
+        },
+      ],
+    },
+  ]
+  const s = formatTestList(tests)
+  // console.log(s)
+  t.deepEqual(
+    s,
+    stripIndent`
+      └─ suite A
+        ├─ works
+        ├─ inner one
+            └─ (empty)
+        └─ inner two
+            └─ (empty)
     `,
   )
 })
