@@ -103,3 +103,20 @@ test('ES6 modules with import keyword', (t) => {
     ],
   })
 })
+
+test('context', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    context('parent', () => {})
+    context.skip('does not work', () => {})
+  `
+  const result = getTestNames(source)
+  t.deepEqual(result, {
+    suiteNames: ['does not work', 'parent'],
+    testNames: [],
+    tests: [
+      { name: 'parent', type: 'suite' },
+      { name: 'does not work', type: 'suite', pending: true },
+    ],
+  })
+})

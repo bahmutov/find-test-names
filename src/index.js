@@ -3,13 +3,15 @@ const walk = require('acorn-walk')
 const debug = require('debug')('find-test-names')
 const { formatTestList } = require('./format-test-list')
 
+const isDescribeName = (name) => name === 'describe' || name === 'context'
+
 const isDescribe = (node) =>
-  node.type === 'CallExpression' && node.callee.name === 'describe'
+  node.type === 'CallExpression' && isDescribeName(node.callee.name)
 
 const isDescribeSkip = (node) =>
   node.type === 'CallExpression' &&
   node.callee.type === 'MemberExpression' &&
-  node.callee.object.name === 'describe' &&
+  isDescribeName(node.callee.object.name) &&
   node.callee.property.name === 'skip'
 
 const isIt = (node) =>
