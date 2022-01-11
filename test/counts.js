@@ -28,7 +28,7 @@ test('just tests have no count', (t) => {
   t.deepEqual(result.structure, twoTests)
 })
 
-test.only('suite counts the tests inside', (t) => {
+test('suite counts the tests inside', (t) => {
   t.plan(1)
   const source = stripIndent`
     describe('loads', () => {
