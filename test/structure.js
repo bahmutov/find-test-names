@@ -77,6 +77,7 @@ test('extract complex structure', (t) => {
       pending: false,
       suiteCount: 1,
       testCount: 3,
+      pendingTestCount: 0,
       suites: [
         {
           name: 'foobar',
@@ -84,6 +85,7 @@ test('extract complex structure', (t) => {
           pending: false,
           suiteCount: 0,
           testCount: 2,
+          pendingTestCount: 0,
           suites: [],
           tests: [
             {
@@ -163,6 +165,7 @@ test('structure with empty suites', (t) => {
       tags: ['@one', '@two'],
       suiteCount: 5,
       testCount: 3,
+      pendingTestCount: 0,
       suites: [
         {
           name: 'empty before',
@@ -170,6 +173,7 @@ test('structure with empty suites', (t) => {
           pending: false,
           suiteCount: 1,
           testCount: 0,
+          pendingTestCount: 0,
           suites: [
             {
               name: 'empty before nested',
@@ -177,6 +181,7 @@ test('structure with empty suites', (t) => {
               pending: false,
               suiteCount: 0,
               testCount: 0,
+              pendingTestCount: 0,
               suites: [],
               tests: [],
               tags: undefined,
@@ -191,6 +196,7 @@ test('structure with empty suites', (t) => {
           pending: false,
           suiteCount: 0,
           testCount: 2,
+          pendingTestCount: 0,
           suites: [],
           tests: [
             {
@@ -214,12 +220,14 @@ test('structure with empty suites', (t) => {
           pending: false,
           testCount: 0,
           suiteCount: 1,
+          pendingTestCount: 0,
           suites: [
             {
               name: 'empty after nested',
               type: 'suite',
               pending: false,
               testCount: 0,
+              pendingTestCount: 0,
               suiteCount: 0,
               suites: [],
               tests: [],

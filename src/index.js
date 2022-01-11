@@ -290,6 +290,49 @@ const getOrphanSuiteAncestorsForSuite = (ancestors, source, nodes) => {
   return null
 }
 
+function countPendingTests(suite) {
+  if (!suite.type === 'suite') {
+    throw new Error('Expected suite')
+  }
+
+  const pendingTestsN = suite.tests.reduce((count, test) => {
+    if (test.type === 'test' && test.pending) {
+      return count + 1
+    }
+    return count
+  }, 0)
+
+  const pendingTestsInSuitesN = suite.suites.reduce((count, suite) => {
+    const pending = countPendingTests(suite)
+    suite.pendingTestCount = pending
+    return count + pending
+  }, 0)
+
+  return pendingTestsN + pendingTestsInSuitesN
+}
+
+/**
+ * Looks at the tests and counts how many tests in each suite
+ * are pending. The parent suites use the sum of the inner
+ * suite counts.
+ * Warning: modifies the input structure
+ */
+function countTests(structure) {
+  let pendingCount = 0
+  structure.forEach((t) => {
+    if (t.type === 'suite') {
+      const pending = countPendingTests(t)
+      if (typeof pending !== 'number') {
+        console.error(t)
+        throw new Error('Could not count pending tests')
+      }
+      t.pendingTestCount = pending
+      pendingCount += pending
+    }
+  })
+  return pendingCount
+}
+
 /**
  * Returns all suite and test names found in the given JavaScript
  * source code (Mocha / Cypress syntax)
@@ -415,6 +458,7 @@ function getTestNames(source, withStructure) {
   }
 
   if (withStructure) {
+    countTests(structure)
     result.structure = structure
   }
 
@@ -424,4 +468,5 @@ function getTestNames(source, withStructure) {
 module.exports = {
   getTestNames,
   formatTestList,
+  countTests,
 }

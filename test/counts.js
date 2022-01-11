@@ -48,6 +48,7 @@ test('suite counts the tests inside', (t) => {
       // counts all tests inside
       testCount: 2,
       tests: twoTests,
+      pendingTestCount: 0,
     },
   ])
 })
@@ -73,6 +74,7 @@ test('suite counts the tests inside inner suites', (t) => {
       type: 'suite',
       pending: false,
       tags: undefined,
+      pendingTestCount: 0,
       suites: [
         {
           name: 'inner1',
@@ -83,6 +85,7 @@ test('suite counts the tests inside inner suites', (t) => {
           suiteCount: 0,
           testCount: 2,
           tests: twoTests,
+          pendingTestCount: 0,
         },
         {
           name: 'inner2',
@@ -93,6 +96,7 @@ test('suite counts the tests inside inner suites', (t) => {
           suiteCount: 0,
           testCount: 2,
           tests: twoTests,
+          pendingTestCount: 0,
         },
       ],
       suiteCount: 2,
@@ -139,6 +143,7 @@ test('handles counts in deeply nested structure', (t) => {
       pending: false,
       tags: undefined,
       testCount: 6,
+      pendingTestCount: 0,
       suiteCount: 4,
       suites: [
         {
@@ -147,6 +152,7 @@ test('handles counts in deeply nested structure', (t) => {
           pending: false,
           suites: [],
           testCount: 2,
+          pendingTestCount: 0,
           suiteCount: 0,
           tests: [
             {
@@ -170,6 +176,7 @@ test('handles counts in deeply nested structure', (t) => {
           pending: false,
           suiteCount: 2,
           testCount: 3,
+          pendingTestCount: 0,
           tags: undefined,
           suites: [
             {
@@ -179,6 +186,7 @@ test('handles counts in deeply nested structure', (t) => {
               suiteCount: 1,
               tags: undefined,
               testCount: 2,
+              pendingTestCount: 0,
               suites: [
                 {
                   name: 'greatgrandchild1',
@@ -187,6 +195,7 @@ test('handles counts in deeply nested structure', (t) => {
                   suiteCount: 0,
                   tags: undefined,
                   testCount: 1,
+                  pendingTestCount: 0,
                   suites: [],
                   tests: [
                     {
@@ -224,6 +233,36 @@ test('handles counts in deeply nested structure', (t) => {
           tags: undefined,
           type: 'test',
           pending: false,
+        },
+      ],
+    },
+  ])
+})
+
+test('counts pending tests', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    describe('foo', () => {
+      it.skip('bar', () => {})
+    })
+  `
+  const result = getTestNames(source, true)
+  t.deepEqual(result.structure, [
+    {
+      name: 'foo',
+      type: 'suite',
+      pending: false,
+      tags: undefined,
+      suiteCount: 0,
+      suites: [],
+      testCount: 1,
+      pendingTestCount: 1,
+      tests: [
+        {
+          name: 'bar',
+          type: 'test',
+          pending: true,
+          tags: undefined,
         },
       ],
     },
