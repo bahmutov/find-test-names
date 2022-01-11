@@ -332,6 +332,9 @@ function countTests(structure) {
       pendingTestCount += pending
     } else {
       testCount += 1
+      if (t.pending) {
+        pendingTestCount += 1
+      }
     }
   })
   return { testCount, pendingTestCount }

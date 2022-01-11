@@ -30,6 +30,17 @@ test('just tests have no count', (t) => {
   t.deepEqual(result.pendingTestCount, 0)
 })
 
+test('tests with pending', (t) => {
+  t.plan(2)
+  const source = stripIndent`
+    it('works a', () => {})
+    it('works b')
+  `
+  const result = getTestNames(source, true)
+  t.deepEqual(result.testCount, 2)
+  t.deepEqual(result.pendingTestCount, 1)
+})
+
 test('suite counts the tests inside', (t) => {
   t.plan(3)
   const source = stripIndent`
