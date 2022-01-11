@@ -17,7 +17,8 @@
     "semantic-release": "semantic-release",
     "demo": "DEBUG=find-test-names node bin/find-test-names.js demo/spec.js",
     "demo-update-md": "DEBUG=find-test-names node bin/update-test-count.js out.md 'test-cy/**/*.js'",
-    "demo-print": "node bin/print-tests.js 'test-cy/**/*.js'"
+    "demo-print": "node bin/print-tests.js 'test-cy/**/*.js'",
+    "stop-only": "stop-only --folder test"
   },
   "repository": {
     "type": "git",
@@ -45,6 +46,7 @@
     "ava": "^3.15.0",
     "common-tags": "^1.8.2",
     "prettier": "^2.4.1",
-    "semantic-release": "^18.0.0"
+    "semantic-release": "^18.0.0",
+    "stop-only": "^3.1.2"
   }
 }
