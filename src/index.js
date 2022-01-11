@@ -105,6 +105,8 @@ const getDescribe = (node, source, pending = false) => {
     type: 'suite',
     tests: [],
     suites: [],
+    testCount: 0,
+    suiteCount: 0,
   }
 
   return { suiteInfo, suite }
@@ -147,8 +149,8 @@ const getIt = (node, source, pending = false) => {
  * Loops over the ancestor nodes of a it / it.skip node
  * until it finds an already known suite node or the top of the tree.
  *
- * It uses a suite cache by node to make sure
- * subsequently found tests will stop traversing at already known suites.
+ * It uses a suite cache by node to make sure no tests / suites are added twice.
+ * It still has to walk the whole tree for every test in order to aggregate the suite / test counts.
  *
  * Technical details:
  *   acorn-walk does depth first traversal,
@@ -164,6 +166,7 @@ const getSuiteAncestorsForTest = (test, source, ancestors, nodes) => {
   let knownNode = false
   let prevSuite
   let describeFound = false
+  let suiteCount = 0
 
   for (var i = ancestors.length - 1; i >= 0; i--) {
     const node = ancestors[i]
@@ -184,6 +187,7 @@ const getSuiteAncestorsForTest = (test, source, ancestors, nodes) => {
       }
 
       if (prevSuite) {
+        suiteCount++
         suite.suites.push(prevSuite)
       }
 
@@ -194,11 +198,10 @@ const getSuiteAncestorsForTest = (test, source, ancestors, nodes) => {
         describeFound = true
       }
 
-      if (knownNode) {
-        break
-      }
+      suite.testCount++
+      suite.suiteCount += suiteCount
 
-      prevSuite = suite
+      prevSuite = knownNode ? null : suite
     }
   }
 
@@ -227,6 +230,7 @@ const getSuiteAncestorsForTest = (test, source, ancestors, nodes) => {
 const getOrphanSuiteAncestorsForSuite = (ancestors, source, nodes) => {
   let prevSuite
   let knownNode = false
+  let suiteCount = 0
 
   for (var i = ancestors.length - 1; i >= 0; i--) {
     // in the first iteration the ancestor is identical to the node
@@ -237,24 +241,35 @@ const getOrphanSuiteAncestorsForSuite = (ancestors, source, nodes) => {
 
     if (describe || skip) {
       if (nodes.has(ancestor.callee)) {
+        if (i === 0) {
+          // If the deepest node in the tree is known, we don't need to walk up
+          break
+        }
+
         // Reached an already known suite
         knownNode = true
+        const suite = nodes.get(ancestor.callee)
+
         if (prevSuite) {
           // Add new child suite to suite
-          nodes.get(ancestor.callee).suites.push(prevSuite)
+          suite.suites.push(prevSuite)
+          prevSuite = null
         }
-        break
+
+        suite.suiteCount += suiteCount
+      } else {
+        const { suite } = getDescribe(ancestor, source, skip)
+
+        if (prevSuite) {
+          suite.suites.push(prevSuite)
+          suite.suiteCount += suiteCount
+        }
+
+        suiteCount++
+
+        nodes.set(ancestor.callee, suite)
+        prevSuite = knownNode ? null : suite
       }
-
-      const { suite } = getDescribe(ancestor, source, skip)
-
-      if (prevSuite) {
-        suite.suites.push(prevSuite)
-      }
-
-      nodes.set(ancestor.callee, suite)
-
-      prevSuite = suite
     }
   }
 
