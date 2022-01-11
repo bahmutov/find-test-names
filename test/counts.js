@@ -2,6 +2,107 @@ const { stripIndent } = require('common-tags')
 const test = require('ava')
 const { getTestNames } = require('../src')
 
+// common structure for two tests we expect to find
+const twoTests = [
+  {
+    name: 'works a',
+    type: 'test',
+    pending: false,
+    tags: undefined,
+  },
+  {
+    name: 'works b',
+    type: 'test',
+    pending: false,
+    tags: undefined,
+  },
+]
+
+test('just tests have no count', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    it('works a', () => {})
+    it('works b', () => {})
+  `
+  const result = getTestNames(source, true)
+  t.deepEqual(result.structure, twoTests)
+})
+
+test.only('suite counts the tests inside', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    describe('loads', () => {
+      it('works a', () => {})
+      it('works b', () => {})
+    })
+  `
+  const result = getTestNames(source, true)
+  t.deepEqual(result.structure, [
+    {
+      name: 'loads',
+      type: 'suite',
+      pending: false,
+      tags: undefined,
+      suites: [],
+      suiteCount: 0,
+      // counts all tests inside
+      testCount: 2,
+      tests: twoTests,
+    },
+  ])
+})
+
+test('suite counts the tests inside inner suites', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    describe('parent', () => {
+      describe('inner1', () => {
+        it('works a', () => {})
+        it('works b', () => {})
+      })
+      describe('inner2', () => {
+        it('works a', () => {})
+        it('works b', () => {})
+      })
+    })
+  `
+  const result = getTestNames(source, true)
+  t.deepEqual(result.structure, [
+    {
+      name: 'parent',
+      type: 'suite',
+      pending: false,
+      tags: undefined,
+      suites: [
+        {
+          name: 'inner1',
+          type: 'suite',
+          pending: false,
+          tags: undefined,
+          suites: [],
+          suiteCount: 0,
+          testCount: 2,
+          tests: twoTests,
+        },
+        {
+          name: 'inner2',
+          type: 'suite',
+          pending: false,
+          tags: undefined,
+          suites: [],
+          suiteCount: 0,
+          testCount: 2,
+          tests: twoTests,
+        },
+      ],
+      suiteCount: 2,
+      // counts all the test inside
+      testCount: 4,
+      tests: [],
+    },
+  ])
+})
+
 test('handles counts in deeply nested structure', (t) => {
   t.plan(1)
   const source = stripIndent`
