@@ -19,17 +19,19 @@ const twoTests = [
 ]
 
 test('just tests have no count', (t) => {
-  t.plan(1)
+  t.plan(3)
   const source = stripIndent`
     it('works a', () => {})
     it('works b', () => {})
   `
   const result = getTestNames(source, true)
   t.deepEqual(result.structure, twoTests)
+  t.deepEqual(result.testCount, 2)
+  t.deepEqual(result.pendingTestCount, 0)
 })
 
 test('suite counts the tests inside', (t) => {
-  t.plan(1)
+  t.plan(3)
   const source = stripIndent`
     describe('loads', () => {
       it('works a', () => {})
@@ -51,6 +53,8 @@ test('suite counts the tests inside', (t) => {
       pendingTestCount: 0,
     },
   ])
+  t.deepEqual(result.testCount, 2)
+  t.deepEqual(result.pendingTestCount, 0)
 })
 
 test('suite counts the tests inside inner suites', (t) => {
@@ -240,7 +244,7 @@ test('handles counts in deeply nested structure', (t) => {
 })
 
 test('counts pending tests', (t) => {
-  t.plan(1)
+  t.plan(3)
   const source = stripIndent`
     describe('foo', () => {
       it.skip('bar', () => {})
@@ -267,4 +271,7 @@ test('counts pending tests', (t) => {
       ],
     },
   ])
+
+  t.deepEqual(result.testCount, 1)
+  t.deepEqual(result.pendingTestCount, 1)
 })

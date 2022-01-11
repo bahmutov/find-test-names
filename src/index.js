@@ -318,19 +318,23 @@ function countPendingTests(suite) {
  * Warning: modifies the input structure
  */
 function countTests(structure) {
-  let pendingCount = 0
+  let testCount = 0
+  let pendingTestCount = 0
   structure.forEach((t) => {
     if (t.type === 'suite') {
+      testCount += t.testCount
       const pending = countPendingTests(t)
       if (typeof pending !== 'number') {
         console.error(t)
         throw new Error('Could not count pending tests')
       }
       t.pendingTestCount = pending
-      pendingCount += pending
+      pendingTestCount += pending
+    } else {
+      testCount += 1
     }
   })
-  return pendingCount
+  return { testCount, pendingTestCount }
 }
 
 /**
@@ -458,8 +462,10 @@ function getTestNames(source, withStructure) {
   }
 
   if (withStructure) {
-    countTests(structure)
+    const counts = countTests(structure)
     result.structure = structure
+    result.testCount = counts.testCount
+    result.pendingTestCount = counts.pendingTestCount
   }
 
   return result
