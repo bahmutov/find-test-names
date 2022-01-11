@@ -23,6 +23,7 @@ test('test with a single string tag', (t) => {
       {
         name: 'foo',
         type: 'suite',
+        pending: false,
       },
     ],
   })
@@ -49,6 +50,7 @@ test('test with tags', (t) => {
       {
         name: 'foo',
         type: 'suite',
+        pending: false,
       },
     ],
   })
@@ -75,6 +77,7 @@ test('skipped test with tags', (t) => {
       {
         name: 'foo',
         type: 'suite',
+        pending: false,
       },
     ],
   })
@@ -101,6 +104,7 @@ test('describe with tags', (t) => {
         name: 'foo',
         tags: ['@one', '@two'],
         type: 'suite',
+        pending: false,
       },
     ],
   })

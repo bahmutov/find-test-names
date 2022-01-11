@@ -39,6 +39,7 @@ test('typescript annotation', (t) => {
       {
         name: 'TypeScript spec',
         type: 'suite',
+        pending: false,
       },
     ],
   })
@@ -69,6 +70,7 @@ test('typescript interface', (t) => {
       {
         name: 'TypeScript spec',
         type: 'suite',
+        pending: false,
       },
     ],
   })
@@ -99,6 +101,7 @@ test('typescript type', (t) => {
       {
         name: 'TypeScript spec',
         type: 'suite',
+        pending: false,
       },
     ],
   })
@@ -130,6 +133,7 @@ test('typescript enum', (t) => {
       {
         name: 'TypeScript spec',
         type: 'suite',
+        pending: false,
       },
     ],
   })
@@ -173,6 +177,7 @@ test('typescript class with field modifiers', (t) => {
       {
         name: 'TypeScript spec',
         type: 'suite',
+        pending: false,
       },
     ],
   })
@@ -199,6 +204,7 @@ test('typescript pending test', (t) => {
       {
         name: 'TypeScript spec',
         type: 'suite',
+        pending: false,
       },
     ],
   })

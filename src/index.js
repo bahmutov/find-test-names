@@ -87,10 +87,19 @@ const getDescribe = (node, source, pending = false) => {
   const suiteInfo = {
     name,
     type: 'suite',
+    pending,
   }
 
   if (pending) {
     suiteInfo.pending = true
+  }
+
+  if (!pending) {
+    // the suite might be pending by the virtue of only having the name
+    // example: describe("is pending")
+    if (node.arguments.length === 1) {
+      suiteInfo.pending = true
+    }
   }
 
   const tags = getTags(source, node)
@@ -101,7 +110,7 @@ const getDescribe = (node, source, pending = false) => {
   const suite = {
     name,
     tags: suiteInfo.tags,
-    pending,
+    pending: suiteInfo.pending,
     type: 'suite',
     tests: [],
     suites: [],
