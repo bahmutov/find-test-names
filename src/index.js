@@ -340,6 +340,17 @@ function countTests(structure) {
   return { testCount, pendingTestCount }
 }
 
+function visitEachTest(structure, fn) {
+  structure.forEach((t) => {
+    if (t.type === 'suite') {
+      visitEachTest(t.tests, fn)
+      visitEachTest(t.suites, fn)
+    } else {
+      fn(t)
+    }
+  })
+}
+
 /**
  * Returns all suite and test names found in the given JavaScript
  * source code (Mocha / Cypress syntax)
@@ -478,4 +489,5 @@ module.exports = {
   getTestNames,
   formatTestList,
   countTests,
+  visitEachTest,
 }
