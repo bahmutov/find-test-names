@@ -341,6 +341,47 @@ function countTests(structure) {
 }
 
 /**
+ * Synchronous tree walker, calls the given callback for each test.
+ * @param {object} structure
+ * @param {function} fn Receives the test as argument
+ */
+function visitEachTest(structure, fn) {
+  structure.forEach((t) => {
+    if (t.type === 'suite') {
+      visitEachTest(t.tests, fn)
+      visitEachTest(t.suites, fn)
+    } else {
+      fn(t)
+    }
+  })
+}
+
+/**
+ * Counts the tags found on the tests.
+ * @param {object} structure
+ * @returns {object} with tags as keys and counts for each
+ */
+function countTags(structure) {
+  const tags = {}
+  visitEachTest(structure, (test) => {
+    if (!test.tags) {
+      return
+    }
+    // normalize the tags to be an array of strings
+    const list = [].concat(test.tags)
+    list.forEach((tag) => {
+      if (!(tag in tags)) {
+        tags[tag] = 1
+      } else {
+        tags[tag] += 1
+      }
+    })
+  })
+
+  return tags
+}
+
+/**
  * Returns all suite and test names found in the given JavaScript
  * source code (Mocha / Cypress syntax)
  * @param {string} source
@@ -478,4 +519,6 @@ module.exports = {
   getTestNames,
   formatTestList,
   countTests,
+  visitEachTest,
+  countTags,
 }
