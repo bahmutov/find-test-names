@@ -1,4 +1,4 @@
-const { getTestNames, visitEachTest } = require('../src')
+const { getTestNames, visitEachTest, countTags } = require('../src')
 const { stripIndent } = require('common-tags')
 const test = require('ava')
 
@@ -107,4 +107,47 @@ test('passes the test info to the callback', (t) => {
     counter += 1
   })
   t.deepEqual(counter, 2)
+})
+
+test('collects the test tags', (t) => {
+  t.plan(2)
+  const source = stripIndent`
+    describe('parent', () => {
+      describe('inner 1', () => {
+        it('works a', {tags: '@user'}, () => {})
+      })
+
+      describe('inner 2', () => {
+        it('works b', {tags: ['@tag1', '@tag2']} , () => {})
+      })
+
+      it('works c', {tags: '@tag1'}, () => {})
+    })
+  `
+  const result = getTestNames(source, true)
+  // in place experimentation
+  const tags = {}
+  visitEachTest(result.structure, (test) => {
+    if (!test.tags) {
+      return
+    }
+    // normalize the tags to be an array of strings
+    const list = [].concat(test.tags)
+    list.forEach((tag) => {
+      if (!(tag in tags)) {
+        tags[tag] = 1
+      } else {
+        tags[tag] += 1
+      }
+    })
+  })
+  t.deepEqual(tags, {
+    '@user': 1,
+    '@tag1': 2,
+    '@tag2': 1,
+  })
+
+  // library function
+  const foundTags = countTags(result.structure)
+  t.deepEqual(tags, foundTags)
 })

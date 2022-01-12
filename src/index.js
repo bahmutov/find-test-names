@@ -340,6 +340,11 @@ function countTests(structure) {
   return { testCount, pendingTestCount }
 }
 
+/**
+ * Synchronous tree walker, calls the given callback for each test.
+ * @param {object} structure
+ * @param {function} fn Receives the test as argument
+ */
 function visitEachTest(structure, fn) {
   structure.forEach((t) => {
     if (t.type === 'suite') {
@@ -349,6 +354,31 @@ function visitEachTest(structure, fn) {
       fn(t)
     }
   })
+}
+
+/**
+ * Counts the tags found on the tests.
+ * @param {object} structure
+ * @returns {object} with tags as keys and counts for each
+ */
+function countTags(structure) {
+  const tags = {}
+  visitEachTest(structure, (test) => {
+    if (!test.tags) {
+      return
+    }
+    // normalize the tags to be an array of strings
+    const list = [].concat(test.tags)
+    list.forEach((tag) => {
+      if (!(tag in tags)) {
+        tags[tag] = 1
+      } else {
+        tags[tag] += 1
+      }
+    })
+  })
+
+  return tags
 }
 
 /**
@@ -490,4 +520,5 @@ module.exports = {
   formatTestList,
   countTests,
   visitEachTest,
+  countTags,
 }
