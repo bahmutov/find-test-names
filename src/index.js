@@ -99,6 +99,13 @@ const getDescribe = (node, source, pending = false) => {
     // example: describe("is pending")
     if (node.arguments.length === 1) {
       suiteInfo.pending = true
+    } else if (
+      node.arguments.length === 2 &&
+      node.arguments[1].type === 'ObjectExpression'
+    ) {
+      // the suite has a name and a config object
+      // but now callback, thus it is pending
+      suiteInfo.pending = true
     }
   }
 

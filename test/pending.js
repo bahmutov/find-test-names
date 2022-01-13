@@ -92,3 +92,16 @@ test('pending test with tags without a callback', (t) => {
     tests: [{ name: 'works', type: 'test', pending: true, tags: ['@basic'] }],
   })
 })
+
+test('pending suite with tags without a callback', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    describe('works', {tags: '@basic'})
+  `
+  const result = getTestNames(source)
+  t.deepEqual(result, {
+    suiteNames: ['works'],
+    testNames: [],
+    tests: [{ name: 'works', type: 'suite', pending: true, tags: ['@basic'] }],
+  })
+})
