@@ -340,18 +340,37 @@ function countTests(structure) {
   return { testCount, pendingTestCount }
 }
 
+function collectSuiteTagsUp(suite) {
+  const tags = []
+  while (suite) {
+    tags.push(...(suite.tags || []))
+    suite = suite.parent
+  }
+  return tags
+}
+
 /**
  * Synchronous tree walker, calls the given callback for each test.
  * @param {object} structure
  * @param {function} fn Receives the test as argument
  */
-function visitEachTest(structure, fn) {
+function visitEachTest(structure, fn, parentSuite) {
   structure.forEach((t) => {
     if (t.type === 'suite') {
-      visitEachTest(t.tests, fn)
+      visitEachTest(t.tests, fn, t)
       visitEachTest(t.suites, fn)
     } else {
-      fn(t)
+      fn(t, parentSuite)
+    }
+  })
+}
+
+function visitEachNode(structure, fn, parentSuite) {
+  structure.forEach((t) => {
+    fn(t, parentSuite)
+    if (t.type === 'suite') {
+      visitEachNode(t.tests, fn, t)
+      visitEachNode(t.suites, fn, t)
     }
   })
 }
@@ -362,14 +381,24 @@ function visitEachTest(structure, fn) {
  * @returns {object} with tags as keys and counts for each
  */
 function countTags(structure) {
+  setParentSuite(structure)
+
   const tags = {}
-  visitEachTest(structure, (test) => {
-    if (!test.tags) {
-      return
-    }
+  visitEachTest(structure, (test, parentSuite) => {
     // normalize the tags to be an array of strings
-    const list = [].concat(test.tags)
+    const list = [].concat(test.tags || [])
     list.forEach((tag) => {
+      if (!(tag in tags)) {
+        tags[tag] = 1
+      } else {
+        tags[tag] += 1
+      }
+    })
+
+    // also consider the effective tags by traveling up
+    // the parent chain of suites
+    const suiteTags = collectSuiteTagsUp(parentSuite)
+    suiteTags.forEach((tag) => {
       if (!(tag in tags)) {
         tags[tag] = 1
       } else {
@@ -379,6 +408,14 @@ function countTags(structure) {
   })
 
   return tags
+}
+
+function setParentSuite(structure) {
+  visitEachNode(structure, (test, parentSuite) => {
+    if (parentSuite) {
+      test.parent = parentSuite
+    }
+  })
 }
 
 /**
@@ -521,4 +558,6 @@ module.exports = {
   countTests,
   visitEachTest,
   countTags,
+  visitEachNode,
+  setParentSuite,
 }
