@@ -134,6 +134,13 @@ const getIt = (node, source, pending = false) => {
     // example: it("is pending")
     if (node.arguments.length === 1) {
       testInfo.pending = true
+    } else if (
+      node.arguments.length === 2 &&
+      node.arguments[1].type === 'ObjectExpression'
+    ) {
+      // the test has a name and a config object
+      // but now callback, thus it is pending
+      testInfo.pending = true
     }
   }
 
