@@ -364,11 +364,8 @@ function visitEachTest(structure, fn) {
 function countTags(structure) {
   const tags = {}
   visitEachTest(structure, (test) => {
-    if (!test.tags) {
-      return
-    }
     // normalize the tags to be an array of strings
-    const list = [].concat(test.tags)
+    const list = [].concat(test.tags || [])
     list.forEach((tag) => {
       if (!(tag in tags)) {
         tags[tag] = 1
@@ -376,6 +373,9 @@ function countTags(structure) {
         tags[tag] += 1
       }
     })
+
+    // also consider the effective tags by traveling up
+    // the parent chain of suites
   })
 
   return tags
