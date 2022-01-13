@@ -345,13 +345,13 @@ function countTests(structure) {
  * @param {object} structure
  * @param {function} fn Receives the test as argument
  */
-function visitEachTest(structure, fn) {
+function visitEachTest(structure, fn, parentSuite) {
   structure.forEach((t) => {
     if (t.type === 'suite') {
-      visitEachTest(t.tests, fn)
+      visitEachTest(t.tests, fn, t)
       visitEachTest(t.suites, fn)
     } else {
-      fn(t)
+      fn(t, parentSuite)
     }
   })
 }

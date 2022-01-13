@@ -151,3 +151,46 @@ test('collects the test tags', (t) => {
   const foundTags = countTags(result.structure)
   t.deepEqual(tags, foundTags)
 })
+
+test('passes the parent suite parameter', (t) => {
+  t.plan(3)
+  const source = stripIndent`
+    describe('parent', () => {
+      it('works a', () => {})
+      it('works b', () => {})
+    })
+  `
+  const result = getTestNames(source, true)
+
+  let counter = 0
+  visitEachTest(result.structure, (test, parentSuite) => {
+    counter += 1
+    t.is(parentSuite.name, 'parent')
+  })
+  t.deepEqual(counter, 2)
+})
+
+test('passes the correct suite parameter', (t) => {
+  t.plan(3)
+  const source = stripIndent`
+    describe('parent', () => {
+      it('works a', () => {})
+
+      describe('inner', () => {
+        it('works b', () => {})
+      })
+    })
+  `
+  const result = getTestNames(source, true)
+
+  let counter = 0
+  visitEachTest(result.structure, (test, parentSuite) => {
+    counter += 1
+    if (test.name === 'works a') {
+      t.is(parentSuite.name, 'parent')
+    } else if (test.name === 'works b') {
+      t.is(parentSuite.name, 'inner')
+    }
+  })
+  t.deepEqual(counter, 2)
+})
