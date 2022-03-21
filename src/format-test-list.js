@@ -21,7 +21,7 @@ function formatTestList(tests, indent = 0) {
       start = test.pending ? pendingMiddleSpacer : middleSpacer
     }
 
-    let nameLine = `${start}${test.name}`
+    let nameLine = test.name ? `${start}${test.name}` : `${start}<unknown test>`
     if (Array.isArray(test.tags)) {
       nameLine += ` [${test.tags.join(', ')}]`
     }

@@ -46,12 +46,16 @@ const getTags = (source, node) => {
 }
 
 // extracts the test name from the literal or template literal node
+// if the test name is a variable, returns undefined
 const extractTestName = (node) => {
   if (node.type === 'TemplateLiteral') {
     return node.quasis.map((q) => q.value.cooked.trim()).join(' ')
   } else if (node.type === 'Literal') {
     return node.value
+  } else if (node.type === 'Identifier') {
+    return undefined
   }
+
   throw new Error(`Unsupported node type: ${node.type}`)
 }
 
@@ -85,9 +89,11 @@ const proxy = new Proxy(base, {
 const getDescribe = (node, source, pending = false) => {
   const name = extractTestName(node.arguments[0])
   const suiteInfo = {
-    name,
     type: 'suite',
     pending,
+  }
+  if (typeof name !== 'undefined') {
+    suiteInfo.name = name
   }
 
   if (pending) {
@@ -131,9 +137,11 @@ const getDescribe = (node, source, pending = false) => {
 const getIt = (node, source, pending = false) => {
   const name = extractTestName(node.arguments[0])
   const testInfo = {
-    name,
     type: 'test',
     pending,
+  }
+  if (typeof name !== 'undefined') {
+    testInfo.name = name
   }
 
   if (!pending) {
@@ -523,7 +531,9 @@ function getTestNames(source, withStructure) {
             structure.push(suiteOrTest)
           }
 
-          testNames.push(testInfo.name)
+          if (typeof testInfo.name !== 'undefined') {
+            testNames.push(testInfo.name)
+          }
           tests.push(testInfo)
         } else if (isItSkip(node)) {
           const { testInfo, test } = getIt(node, source, true)

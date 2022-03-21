@@ -92,6 +92,18 @@ If there are tags, they are shown after the name
 └─ last
 ```
 
+### Unknown test names
+
+Sometimes a test name comes from a variable, not from a literal string.
+
+```js
+// test name is a variable, not a literal string
+const testName = 'nice'
+it(testName, () => {})
+```
+
+In that case, the tags are still extracted. When printing, such tests have name `<unknown test>`.
+
 ## Debugging
 
 Run with the environment variable `DEBUG=find-test-names` to see verbose logs

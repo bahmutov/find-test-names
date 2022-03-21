@@ -12,3 +12,7 @@ describe('parent suite', () => {
 })
 
 it.skip('pending test', () => {})
+
+// test name is a variable, not a literal string
+const testName = 'nice'
+it(testName, () => {})
