@@ -35,3 +35,38 @@ test('variable as test name then tags', (t) => {
     tests: [{ type: 'test', pending: false, tags: ['@first', '@second'] }],
   })
 })
+
+test('concatenated strings', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    it('super' + ' ' + 'test', { tags: ['@first', '@second'] }, () => {})
+  `
+  const result = getTestNames(source)
+  // console.dir(result, { depth: null })
+  // the result should have a test without a name
+  // and have the list of tags
+  t.deepEqual(result, {
+    suiteNames: [],
+    testNames: [],
+    tests: [{ type: 'test', pending: false, tags: ['@first', '@second'] }],
+  })
+})
+
+test('member expression', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    const names = {
+      first: 'my test',
+    }
+    it(names.first, { tags: ['@first', '@second'] }, () => {})
+  `
+  const result = getTestNames(source)
+  // console.dir(result, { depth: null })
+  // the result should have a test without a name
+  // and have the list of tags
+  t.deepEqual(result, {
+    suiteNames: [],
+    testNames: [],
+    tests: [{ type: 'test', pending: false, tags: ['@first', '@second'] }],
+  })
+})

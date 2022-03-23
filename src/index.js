@@ -52,11 +52,11 @@ const extractTestName = (node) => {
     return node.quasis.map((q) => q.value.cooked.trim()).join(' ')
   } else if (node.type === 'Literal') {
     return node.value
-  } else if (node.type === 'Identifier') {
+  } else {
+    debug('Not sure how to get the test name from this source node')
+    debug(node)
     return undefined
   }
-
-  throw new Error(`Unsupported node type: ${node.type}`)
 }
 
 const plugins = [
