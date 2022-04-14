@@ -43,6 +43,28 @@ To view this in action, use `npm run demo-structure` which points at [bin/find-t
 
 The tests `it.skip` are extracted and have the property `pending: true`
 
+### setEffectiveTags
+
+Often, you want to have each test and see which tags it has and what parent tags apply to it. You can compute for each test a list of _effective_ tags and set it for each test.
+
+```js
+// example spec code
+describe('parent', { tags: '@user' }, () => {
+  describe('parent', { tags: '@auth' }, () => {
+    it('works a', { tags: '@one' }, () => {})
+    it('works b', () => {})
+  })
+})
+```
+
+```js
+const { getTestNames, setEffectiveTags } = require('find-test-names')
+const result = getTestNames(source, true)
+setEffectiveTags(result.structure)
+```
+
+If you traverse the `result.structure`, the test "works a" will have the `effectiveTags` list with `@user, @auth, @one`, and the test "works b" will have the `effectiveTags` list with `@user, @auth, @one`.
+
 ### Bin
 
 This package includes [bin/find-test-names.js](./bin/find-test-names.js) that you can use from the command line

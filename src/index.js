@@ -432,6 +432,28 @@ function countTags(structure) {
   return tags
 }
 
+/**
+ * Visits each test and counts its tags and its parents' tags
+ * to compute the "effective" tags list.
+ */
+function setEffectiveTags(structure) {
+  setParentSuite(structure)
+
+  visitEachTest(structure, (test, parentSuite) => {
+    // normalize the tags to be an array of strings
+    const ownTags = [].concat(test.tags || [])
+
+    // also consider the effective tags by traveling up
+    // the parent chain of suites
+    const suiteTags = collectSuiteTagsUp(parentSuite)
+    const allTags = [...ownTags, ...suiteTags]
+    const uniqueTags = [...new Set(allTags)]
+    test.effectiveTags = uniqueTags.sort()
+  })
+
+  return structure
+}
+
 function setParentSuite(structure) {
   visitEachNode(structure, (test, parentSuite) => {
     if (parentSuite) {
@@ -584,4 +606,5 @@ module.exports = {
   countTags,
   visitEachNode,
   setParentSuite,
+  setEffectiveTags,
 }
