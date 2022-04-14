@@ -454,6 +454,21 @@ function setEffectiveTags(structure) {
   return structure
 }
 
+/**
+ * Visits each individual test in the structure and checks if it
+ * has any effective tags from the given list.
+ */
+function filterByEffectiveTags(structure, tags) {
+  const filteredTests = []
+  visitEachTest(structure, (test) => {
+    const hasTag = tags.some((tag) => test.effectiveTags.includes(tag))
+    if (hasTag) {
+      filteredTests.push(test)
+    }
+  })
+  return filteredTests
+}
+
 function setParentSuite(structure) {
   visitEachNode(structure, (test, parentSuite) => {
     if (parentSuite) {
@@ -607,4 +622,5 @@ module.exports = {
   visitEachNode,
   setParentSuite,
   setEffectiveTags,
+  filterByEffectiveTags,
 }
