@@ -65,6 +65,23 @@ setEffectiveTags(result.structure)
 
 If you traverse the `result.structure`, the test "works a" will have the `effectiveTags` list with `@user, @auth, @one`, and the test "works b" will have the `effectiveTags` list with `@user, @auth, @one`.
 
+### filterByEffectiveTags
+
+Once you `setEffectiveTags`, you can filter all tests by an effective tag. For example, to fid all tests with the given tag:
+
+```js
+const {
+  getTestNames,
+  setEffectiveTags,
+  filterByEffectiveTags,
+} = require('find-test-names')
+const result = getTestNames(source, true)
+setEffectiveTags(result.structure)
+const tests = filterByEffectiveTags(result.structure, ['@one'])
+```
+
+Returns individual test objects.
+
 ### Bin
 
 This package includes [bin/find-test-names.js](./bin/find-test-names.js) that you can use from the command line
