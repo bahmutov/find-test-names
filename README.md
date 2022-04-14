@@ -82,6 +82,12 @@ const tests = filterByEffectiveTags(result.structure, ['@one'])
 
 Returns individual test objects.
 
+Tip: you can pass the source code and the tags to the `filterByEffectiveTags` function and let it parse it
+
+```js
+const filtered = filterByEffectiveTags(source, ['@user'])
+```
+
 ### Bin
 
 This package includes [bin/find-test-names.js](./bin/find-test-names.js) that you can use from the command line

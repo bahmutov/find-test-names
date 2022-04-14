@@ -459,6 +459,14 @@ function setEffectiveTags(structure) {
  * has any effective tags from the given list.
  */
 function filterByEffectiveTags(structure, tags) {
+  if (typeof structure === 'string') {
+    // we got passed the input source code
+    // so let's parse it first
+    const result = getTestNames(structure, true)
+    setEffectiveTags(result.structure)
+    return filterByEffectiveTags(result.structure, tags)
+  }
+
   const filteredTests = []
   visitEachTest(structure, (test) => {
     const hasTag = tags.some((tag) => test.effectiveTags.includes(tag))
