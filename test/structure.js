@@ -19,6 +19,7 @@ test('handles pending test', (t) => {
 
   t.deepEqual(result.structure, [
     {
+      fullName: 'will be added later',
       name: 'will be added later',
       pending: true,
       tags: undefined,
@@ -36,6 +37,7 @@ test('handles a single test', (t) => {
 
   t.deepEqual(result.structure, [
     {
+      fullName: 'works',
       name: 'works',
       pending: false,
       tags: undefined,
@@ -45,7 +47,7 @@ test('handles a single test', (t) => {
 })
 
 test('extract complex structure', (t) => {
-  t.plan(1)
+  t.plan(3)
   const source = stripIndent`
     it('top', () => {})
 
@@ -64,14 +66,26 @@ test('extract complex structure', (t) => {
   `
   const result = getTestNames(source, true)
 
+  t.deepEqual(result.fullTestNames, [
+    'baz',
+    'foo blipp',
+    'foo foobar bar',
+    'foo foobar quox',
+    'top',
+  ])
+
+  t.deepEqual(result.fullSuiteNames, ['foo', 'foo foobar'])
+
   t.deepEqual(result.structure, [
     {
+      fullName: 'top',
       name: 'top',
       tags: undefined,
       type: 'test',
       pending: false,
     },
     {
+      fullName: 'foo',
       name: 'foo',
       type: 'suite',
       pending: false,
@@ -80,6 +94,7 @@ test('extract complex structure', (t) => {
       pendingTestCount: 0,
       suites: [
         {
+          fullName: 'foo foobar',
           name: 'foobar',
           type: 'suite',
           pending: false,
@@ -89,12 +104,14 @@ test('extract complex structure', (t) => {
           suites: [],
           tests: [
             {
+              fullName: 'foo foobar bar',
               name: 'bar',
               tags: ['@three'],
               type: 'test',
               pending: false,
             },
             {
+              fullName: 'foo foobar quox',
               name: 'quox',
               tags: ['@five'],
               type: 'test',
@@ -106,6 +123,7 @@ test('extract complex structure', (t) => {
       ],
       tests: [
         {
+          fullName: 'foo blipp',
           name: 'blipp',
           tags: undefined,
           type: 'test',
@@ -115,6 +133,7 @@ test('extract complex structure', (t) => {
       tags: ['@one', '@two'],
     },
     {
+      fullName: 'baz',
       name: 'baz',
       tags: ['@one'],
       type: 'test',
@@ -124,7 +143,7 @@ test('extract complex structure', (t) => {
 })
 
 test('structure with empty suites', (t) => {
-  t.plan(1)
+  t.plan(3)
   const source = stripIndent`
     it('top', () => {})
 
@@ -151,14 +170,33 @@ test('structure with empty suites', (t) => {
   `
   const result = getTestNames(source, true)
 
+  t.deepEqual(result.fullTestNames, [
+    'baz',
+    'foo blipp',
+    'foo foobar bar',
+    'foo foobar quox',
+    'top',
+  ])
+
+  t.deepEqual(result.fullSuiteNames, [
+    'foo',
+    'foo empty after',
+    'foo empty after empty after nested',
+    'foo empty before',
+    'foo empty before empty before nested',
+    'foo foobar',
+  ])
+
   t.deepEqual(result.structure, [
     {
+      fullName: 'top',
       name: 'top',
       type: 'test',
       pending: false,
       tags: undefined,
     },
     {
+      fullName: 'foo',
       name: 'foo',
       type: 'suite',
       pending: false,
@@ -168,6 +206,7 @@ test('structure with empty suites', (t) => {
       pendingTestCount: 0,
       suites: [
         {
+          fullName: 'foo empty before',
           name: 'empty before',
           type: 'suite',
           pending: false,
@@ -176,6 +215,7 @@ test('structure with empty suites', (t) => {
           pendingTestCount: 0,
           suites: [
             {
+              fullName: 'foo empty before empty before nested',
               name: 'empty before nested',
               type: 'suite',
               pending: false,
@@ -191,6 +231,7 @@ test('structure with empty suites', (t) => {
           tags: undefined,
         },
         {
+          fullName: 'foo foobar',
           name: 'foobar',
           type: 'suite',
           pending: false,
@@ -200,12 +241,14 @@ test('structure with empty suites', (t) => {
           suites: [],
           tests: [
             {
+              fullName: 'foo foobar bar',
               name: 'bar',
               tags: ['@three'],
               type: 'test',
               pending: false,
             },
             {
+              fullName: 'foo foobar quox',
               name: 'quox',
               tags: ['@five'],
               type: 'test',
@@ -215,6 +258,7 @@ test('structure with empty suites', (t) => {
           tags: ['@four'],
         },
         {
+          fullName: 'foo empty after',
           name: 'empty after',
           type: 'suite',
           pending: false,
@@ -223,6 +267,7 @@ test('structure with empty suites', (t) => {
           pendingTestCount: 0,
           suites: [
             {
+              fullName: 'foo empty after empty after nested',
               name: 'empty after nested',
               type: 'suite',
               pending: false,
@@ -240,6 +285,7 @@ test('structure with empty suites', (t) => {
       ],
       tests: [
         {
+          fullName: 'foo blipp',
           name: 'blipp',
           tags: undefined,
           type: 'test',
@@ -248,6 +294,7 @@ test('structure with empty suites', (t) => {
       ],
     },
     {
+      fullName: 'baz',
       name: 'baz',
       tags: ['@one'],
       type: 'test',

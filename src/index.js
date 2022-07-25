@@ -193,10 +193,17 @@ const getIt = (node, source, pending = false) => {
  *   This is handled by getOrphanSuiteAncestorsForSuite
  *
  */
-const getSuiteAncestorsForTest = (test, source, ancestors, nodes) => {
+const getSuiteAncestorsForTest = (
+  test,
+  source,
+  ancestors,
+  nodes,
+  fullSuiteNames,
+) => {
   let knownNode = false
+  let suiteBranches = []
   let prevSuite
-  let describeFound = false
+  let directParentSuite = null
   let suiteCount = 0
 
   for (var i = ancestors.length - 1; i >= 0; i--) {
@@ -222,31 +229,40 @@ const getSuiteAncestorsForTest = (test, source, ancestors, nodes) => {
         suite.suites.push(prevSuite)
       }
 
-      if (!describeFound) {
-        // found this test's describe
-        suite.tests.push(test)
-
-        describeFound = true
+      if (!directParentSuite) {
+        // found this test's direct parent suite
+        directParentSuite = suite
       }
 
       suite.testCount++
       suite.suiteCount += suiteCount
 
       prevSuite = knownNode ? null : suite
+      suiteBranches.unshift(suite)
     }
   }
 
-  if (!knownNode) {
-    // walked tree to the top
-    if (describeFound) {
-      return prevSuite
-    } else {
-      // top level test
-      return test
-    }
-  }
+  // walked tree to the top
+  if (suiteBranches.length) {
+    // Compute the full names of suite and test, i.e. prepend all parent suite names
+    const suiteNameWithParentSuiteNames = computeParentSuiteNames(
+      suiteBranches,
+      fullSuiteNames,
+    )
 
-  return null
+    test.fullName = `${suiteNameWithParentSuiteNames} ${test.name}`
+
+    directParentSuite.tests.push(test)
+
+    return {
+      suite: !knownNode && prevSuite, // only return the suite if it hasn't been found before
+      topLevelTest: false,
+    }
+  } else {
+    // top level test
+    test.fullName = test.name
+    return { suite: null, topLevelTest: true }
+  }
 }
 
 /**
@@ -258,8 +274,14 @@ const getSuiteAncestorsForTest = (test, source, ancestors, nodes) => {
  * It uses the same nodes cache as getSuiteAncestorsForTest to make sure
  * no suites are added twice / no unnecessary nodes are walked.
  */
-const getOrphanSuiteAncestorsForSuite = (ancestors, source, nodes) => {
+const getOrphanSuiteAncestorsForSuite = (
+  ancestors,
+  source,
+  nodes,
+  fullSuiteNames,
+) => {
   let prevSuite
+  let suiteBranches = []
   let knownNode = false
   let suiteCount = 0
 
@@ -288,6 +310,7 @@ const getOrphanSuiteAncestorsForSuite = (ancestors, source, nodes) => {
         }
 
         suite.suiteCount += suiteCount
+        suiteBranches.unshift(suite)
       } else {
         const { suite } = getDescribe(ancestor, source, skip)
 
@@ -300,9 +323,12 @@ const getOrphanSuiteAncestorsForSuite = (ancestors, source, nodes) => {
 
         nodes.set(ancestor.callee, suite)
         prevSuite = knownNode ? null : suite
+        suiteBranches.unshift(suite)
       }
     }
   }
+
+  computeParentSuiteNames(suiteBranches, fullSuiteNames)
 
   if (!knownNode) {
     // walked tree to the top and found new suite(s)
@@ -310,6 +336,22 @@ const getOrphanSuiteAncestorsForSuite = (ancestors, source, nodes) => {
   }
 
   return null
+}
+
+/**
+ * Compute the full names of suites in an array of branches, i.e. prepend all parent suite names
+ */
+function computeParentSuiteNames(suiteBranches, fullSuiteNames) {
+  let suiteNameWithParentSuiteNames = ''
+
+  suiteBranches.forEach((suite) => {
+    suite.fullName = `${suiteNameWithParentSuiteNames} ${suite.name}`.trim()
+    fullSuiteNames.add(suite.fullName)
+
+    suiteNameWithParentSuiteNames = suite.fullName
+  })
+
+  return suiteNameWithParentSuiteNames
 }
 
 function countPendingTests(suite) {
@@ -512,6 +554,10 @@ function getTestNames(source, withStructure) {
 
   const suiteNames = []
   const testNames = []
+  // suite names with parent suite names prepended
+  const fullSuiteNames = new Set()
+  // test names with parent suite names prepended
+  const fullTestNames = []
   // mixed entries for describe and tests
   // each entry has name and possibly a list of tags
   const tests = []
@@ -535,6 +581,7 @@ function getTestNames(source, withStructure) {
             ancestors,
             source,
             nodes,
+            fullSuiteNames,
           )
 
           if (suite) {
@@ -552,6 +599,7 @@ function getTestNames(source, withStructure) {
             ancestors,
             source,
             nodes,
+            fullSuiteNames,
           )
 
           if (suite) {
@@ -565,37 +613,49 @@ function getTestNames(source, withStructure) {
 
           debug('found test "%s"', testInfo.name)
 
-          const suiteOrTest = getSuiteAncestorsForTest(
+          const { suite, topLevelTest } = getSuiteAncestorsForTest(
             test,
             source,
             ancestors,
             nodes,
+            fullSuiteNames,
           )
 
-          if (suiteOrTest) {
-            structure.push(suiteOrTest)
+          if (suite) {
+            structure.push(suite)
+          } else if (topLevelTest) {
+            structure.push(test)
           }
 
           if (typeof testInfo.name !== 'undefined') {
             testNames.push(testInfo.name)
+            fullTestNames.push(test.fullName)
           }
+
           tests.push(testInfo)
         } else if (isItSkip(node)) {
           const { testInfo, test } = getIt(node, source, true)
           debug('found it.skip "%s"', testInfo.name)
 
-          const suiteOrTest = getSuiteAncestorsForTest(
+          const { suite, topLevelTest } = getSuiteAncestorsForTest(
             test,
             source,
             ancestors,
             nodes,
+            fullSuiteNames,
           )
 
-          if (suiteOrTest) {
-            structure.push(suiteOrTest)
+          if (suite) {
+            structure.push(suite)
+          } else if (topLevelTest) {
+            structure.push(test)
           }
 
-          testNames.push(testInfo.name)
+          if (typeof testInfo.name !== 'undefined') {
+            testNames.push(testInfo.name)
+            fullTestNames.push(test.fullName)
+          }
+
           tests.push(testInfo)
         }
       },
@@ -605,6 +665,8 @@ function getTestNames(source, withStructure) {
 
   const sortedSuiteNames = suiteNames.sort()
   const sortedTestNames = testNames.sort()
+  const sortedFullTestNames = [...fullTestNames].sort()
+  const sortedFullSuiteNames = [...fullSuiteNames].sort()
   const result = {
     suiteNames: sortedSuiteNames,
     testNames: sortedTestNames,
@@ -616,6 +678,8 @@ function getTestNames(source, withStructure) {
     result.structure = structure
     result.testCount = counts.testCount
     result.pendingTestCount = counts.pendingTestCount
+    result.fullTestNames = sortedFullTestNames
+    result.fullSuiteNames = sortedFullSuiteNames
   }
 
   return result
