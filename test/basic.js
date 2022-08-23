@@ -71,3 +71,29 @@ test('context', (t) => {
     ],
   })
 })
+
+test('specify', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    describe('foo', () => {
+      specify('bar', () => {})
+    })
+  `
+  const result = getTestNames(source)
+  t.deepEqual(result, {
+    suiteNames: ['foo'],
+    testNames: ['bar'],
+    tests: [
+      {
+        name: 'bar',
+        type: 'test',
+        pending: false,
+      },
+      {
+        name: 'foo',
+        type: 'suite',
+        pending: false,
+      },
+    ],
+  })
+})

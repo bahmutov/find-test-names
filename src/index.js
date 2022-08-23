@@ -15,12 +15,13 @@ const isDescribeSkip = (node) =>
   node.callee.property.name === 'skip'
 
 const isIt = (node) =>
-  node.type === 'CallExpression' && node.callee.name === 'it'
+  node.type === 'CallExpression' && 
+  ( node.callee.name === 'it' || node.callee.name === 'specify' )
 
 const isItSkip = (node) =>
   node.type === 'CallExpression' &&
   node.callee.type === 'MemberExpression' &&
-  node.callee.object.name === 'it' &&
+  ( node.callee.object.name === 'it' || node.callee.object.name === 'specify' ) &&
   node.callee.property.name === 'skip'
 
 const getTags = (source, node) => {
