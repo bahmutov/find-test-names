@@ -15,13 +15,13 @@ const isDescribeSkip = (node) =>
   node.callee.property.name === 'skip'
 
 const isIt = (node) =>
-  node.type === 'CallExpression' && 
-  ( node.callee.name === 'it' || node.callee.name === 'specify' )
+  node.type === 'CallExpression' &&
+  (node.callee.name === 'it' || node.callee.name === 'specify')
 
 const isItSkip = (node) =>
   node.type === 'CallExpression' &&
   node.callee.type === 'MemberExpression' &&
-  ( node.callee.object.name === 'it' || node.callee.object.name === 'specify' ) &&
+  (node.callee.object.name === 'it' || node.callee.object.name === 'specify') &&
   node.callee.property.name === 'skip'
 
 const getTags = (source, node) => {
@@ -686,6 +686,33 @@ function getTestNames(source, withStructure) {
   return result
 }
 
+/** Given the test source code, finds all tests
+ * and returns a single object with all test titles.
+ * Each key is the full test title.
+ * The value is a list of effective tags for this test.
+ */
+function findEffectiveTestTags(source) {
+  if (typeof source !== 'string') {
+    throw new Error('Expected a string source')
+  }
+
+  const result = getTestNames(source, true)
+  setEffectiveTags(result.structure)
+
+  const testTags = {}
+  visitEachTest(result.structure, (test, parentSuite) => {
+    // console.log(test)
+    if (typeof test.fullName !== 'string') {
+      console.error(test)
+      throw new Error('Cannot find the full name for test')
+    }
+    testTags[test.fullName] = test.effectiveTags
+  })
+
+  // console.log(testTags)
+  return testTags
+}
+
 module.exports = {
   getTestNames,
   formatTestList,
@@ -696,4 +723,5 @@ module.exports = {
   setParentSuite,
   setEffectiveTags,
   filterByEffectiveTags,
+  findEffectiveTestTags,
 }

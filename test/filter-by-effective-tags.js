@@ -8,7 +8,7 @@ const test = require('ava')
 
 const source = stripIndent`
   describe('parent', {tags: '@user'}, () => {
-    describe('parent', {tags: '@auth'}, () => {
+    describe('child', {tags: '@auth'}, () => {
       it('works a', {tags: '@one'}, () => {})
       it('works b', () => {})
     })
