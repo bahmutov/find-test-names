@@ -713,6 +713,16 @@ function findEffectiveTestTags(source) {
   return testTags
 }
 
+/**
+ * Reads the source code of the given spec file from disk
+ * and finds all tests and their effective tags
+ */
+function findEffectiveTestTagsIn(specFilename) {
+  const { readFileSync } = require('fs')
+  const source = readFileSync(specFilename, 'utf8')
+  return findEffectiveTestTags(source)
+}
+
 module.exports = {
   getTestNames,
   formatTestList,
@@ -724,4 +734,5 @@ module.exports = {
   setEffectiveTags,
   filterByEffectiveTags,
   findEffectiveTestTags,
+  findEffectiveTestTagsIn,
 }
