@@ -6,7 +6,7 @@ test('visits each test with effective tags', (t) => {
   t.plan(3)
   const source = stripIndent`
     describe('parent', {tags: '@user'}, () => {
-      describe('parent', {tags: '@auth'}, () => {
+      describe('child', {tags: '@auth'}, () => {
         it('works a', {tags: '@one'}, () => {})
         it('works b', () => {})
       })

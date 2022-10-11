@@ -88,6 +88,10 @@ Tip: you can pass the source code and the tags to the `filterByEffectiveTags` fu
 const filtered = filterByEffectiveTags(source, ['@user'])
 ```
 
+### findEffectiveTestTags
+
+Returns a single object with full test titles as keys. For each key, the value is the list of effective tags. See the [find-effective-tags.js](./test/find-effective-tags.js) spec file.
+
 ### Bin
 
 This package includes [bin/find-test-names.js](./bin/find-test-names.js) that you can use from the command line
