@@ -47,7 +47,7 @@
     "ava": "3.15.0",
     "common-tags": "1.8.2",
     "husky": "7.0.4",
-    "prettier": "2.4.1",
+    "prettier": "2.7.1",
     "semantic-release": "18.0.1",
     "stop-only": "3.1.2"
   }
