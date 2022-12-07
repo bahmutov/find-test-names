@@ -6,7 +6,6 @@ const source = `
    */
 
   // this is a comment
-
   const foo = 'bar'
 `
 

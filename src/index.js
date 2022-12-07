@@ -187,7 +187,7 @@ const getIt = (node, source, pending = false) => {
  * Technical details:
  *   acorn-walk does depth first traversal,
  *   i.e. walk.ancestor is called with the deepest node first, usually an "it",
- *   and a list of its ancestors. (other AST walkers travserse from the top)
+ *   and a list of its ancestors. (other AST walkers traverse from the top)
  *
  *   Since the tree generation starts from it nodes, this function cannot find
  *   suites without tests.
@@ -528,6 +528,22 @@ function setParentSuite(structure) {
   })
 }
 
+function getLeadingComment(ancestors) {
+  if (ancestors.length > 1) {
+    const a = ancestors.at(-2)
+    if (a.leadingComments && a.leadingComments.length) {
+      // grab the last comment line
+      const firstComment = a.leadingComments.at(-1)
+      if (firstComment.type === 'CommentLine') {
+        const leadingComment = firstComment.value
+        if (leadingComment.trim()) {
+          return leadingComment.trim()
+        }
+      }
+    }
+  }
+}
+
 /**
  * Returns all suite and test names found in the given JavaScript
  * source code (Mocha / Cypress syntax)
@@ -613,6 +629,11 @@ function getTestNames(source, withStructure) {
           const { testInfo, test } = getIt(node, source)
 
           debug('found test "%s"', testInfo.name)
+          const comment = getLeadingComment(ancestors)
+          if (comment) {
+            testInfo.comment = comment
+            debug('found leading test comment "%s", comment')
+          }
 
           const { suite, topLevelTest } = getSuiteAncestorsForTest(
             test,
@@ -637,6 +658,12 @@ function getTestNames(source, withStructure) {
         } else if (isItSkip(node)) {
           const { testInfo, test } = getIt(node, source, true)
           debug('found it.skip "%s"', testInfo.name)
+
+          const comment = getLeadingComment(ancestors)
+          if (comment) {
+            testInfo.comment = comment
+            debug('found leading skipped test comment "%s", comment')
+          }
 
           const { suite, topLevelTest } = getSuiteAncestorsForTest(
             test,
