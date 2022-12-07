@@ -187,7 +187,7 @@ const getIt = (node, source, pending = false) => {
  * Technical details:
  *   acorn-walk does depth first traversal,
  *   i.e. walk.ancestor is called with the deepest node first, usually an "it",
- *   and a list of its ancestors. (other AST walkers travserse from the top)
+ *   and a list of its ancestors. (other AST walkers traverse from the top)
  *
  *   Since the tree generation starts from it nodes, this function cannot find
  *   suites without tests.
@@ -613,6 +613,19 @@ function getTestNames(source, withStructure) {
           const { testInfo, test } = getIt(node, source)
 
           debug('found test "%s"', testInfo.name)
+          if (ancestors.length > 1) {
+            const a = ancestors.at(-2)
+            if (a.leadingComments && a.leadingComments.length) {
+              const firstComment = a.leadingComments[0]
+              if (firstComment.type === 'CommentLine') {
+                const leadingComment = firstComment.value
+                if (leadingComment.trim()) {
+                  testInfo.comment = leadingComment.trim()
+                  debug('found leading test comment "%s", testInfo.comment')
+                }
+              }
+            }
+          }
 
           const { suite, topLevelTest } = getSuiteAncestorsForTest(
             test,
