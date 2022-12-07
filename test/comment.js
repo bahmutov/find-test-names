@@ -28,6 +28,34 @@ test('includes the comment', (t) => {
   })
 })
 
+test('grabs the last comment line onle', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    // this is a suite called foo
+    describe('foo', () => {
+      // line 1
+      // line 2
+      // line 3
+      it('bar', () => {})
+    })
+  `
+  const result = getTestNames(source)
+  // the leading comment before the test is extracted
+  t.deepEqual(result, {
+    suiteNames: ['foo'],
+    testNames: ['bar'],
+    tests: [
+      {
+        type: 'test',
+        pending: false,
+        name: 'bar',
+        comment: 'line 3',
+      },
+      { type: 'suite', pending: false, name: 'foo' },
+    ],
+  })
+})
+
 test('skipped test includes the comment', (t) => {
   t.plan(1)
   const source = stripIndent`
