@@ -157,6 +157,20 @@ it(testName, () => {})
 
 In that case, the tags are still extracted. When printing, such tests have name `<unknown test>`.
 
+### comment lines
+
+If the test function has preceding comment lines, the comment line right before the test is extracted and included
+
+```js
+// line 1
+// line 2
+// line 3
+it('works', ...)
+// extracted test object will have
+// name: "works",
+// comment: "line 3"
+```
+
 ## Debugging
 
 Run with the environment variable `DEBUG=find-test-names` to see verbose logs
@@ -171,6 +185,8 @@ Author: Gleb Bahmutov &lt;gleb.bahmutov@gmail.com&gt; &copy; 2021
 - [videos](https://www.youtube.com/glebbahmutov)
 - [presentations](https://slides.com/bahmutov)
 - [cypress.tips](https://cypress.tips)
+- [Cypress Tips & Tricks Newsletter](https://cypresstips.substack.com/)
+- [my Cypress courses](https://cypress.tips/courses)
 
 License: MIT - do anything with the code, but don't blame me if it does not work.
 
