@@ -530,7 +530,7 @@ function setParentSuite(structure) {
 
 function getLeadingComment(ancestors) {
   if (ancestors.length > 1) {
-    const a = ancestors.at(-2)
+    const a = ancestors[ancestors.length - 2]
     if (a.leadingComments && a.leadingComments.length) {
       // grab the last comment line
       const firstComment = a.leadingComments.at(-1)
