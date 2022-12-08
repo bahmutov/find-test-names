@@ -533,7 +533,7 @@ function getLeadingComment(ancestors) {
     const a = ancestors[ancestors.length - 2]
     if (a.leadingComments && a.leadingComments.length) {
       // grab the last comment line
-      const firstComment = a.leadingComments.at(-1)
+      const firstComment = a.leadingComments[a.leadingComments.length - 1]
       if (firstComment.type === 'CommentLine') {
         const leadingComment = firstComment.value
         if (leadingComment.trim()) {
