@@ -2,25 +2,43 @@ const { findEffectiveTestTags } = require('../src')
 const { stripIndent } = require('common-tags')
 const test = require('ava')
 
-test.skip('finds only tags', (t) => {
+test('finds only tags in a single test', (t) => {
   t.plan(1)
   // confirm "onlyTags" works
   const source = stripIndent`
-    describe('parent', {tags: '@user'}, () => {
-      describe('child', {tags: '@auth'}, () => {
-        it('works a', {tags: '@one'}, () => {})
-        it('works b', () => {})
-      })
-    })
-    it('sits at the top', {tags: '@root'}, () => {})
-    it.skip('has no tags')
+    it('works', {tags: '@one', onlyTags: '@special'}, () => {})
   `
   const result = findEffectiveTestTags(source)
   const expected = {
-    'sits at the top': ['@root'],
-    'parent child works a': ['@auth', '@one', '@user'],
-    'parent child works b': ['@auth', '@user'],
-    'has no tags': [],
+    works: { effectiveTags: ['@one'], onlyTags: ['@special'] },
+  }
+  t.deepEqual(result, expected)
+})
+
+test('applies suite only tags to the tests', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    describe('parent', {onlyTags: '@special'}, () => {
+      it('works', {tags: '@one'}, () => {})
+    })
+  `
+  const result = findEffectiveTestTags(source)
+  const expected = {
+    'parent works': { effectiveTags: ['@one'], onlyTags: ['@special'] },
+  }
+  t.deepEqual(result, expected)
+})
+
+test('combines suite and test only tags', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    describe('parent', {onlyTags: '@special'}, () => {
+      it('works', {onlyTags: '@super'}, () => {})
+    })
+  `
+  const result = findEffectiveTestTags(source)
+  const expected = {
+    'parent works': { effectiveTags: [], onlyTags: ['@special', '@super'] },
   }
   t.deepEqual(result, expected)
 })
