@@ -733,7 +733,7 @@ function findEffectiveTestTags(source) {
       console.error(test)
       throw new Error('Cannot find the full name for test')
     }
-    testTags[test.fullName] = test.effectiveTags
+    testTags[test.fullName] = { effectiveTags: test.effectiveTags }
   })
 
   // console.log(testTags)
