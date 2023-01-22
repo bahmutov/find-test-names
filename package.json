@@ -44,7 +44,7 @@
     "simple-bin-help": "^1.7.7"
   },
   "devDependencies": {
-    "ava": "5.1.0",
+    "ava": "5.1.1",
     "common-tags": "1.8.2",
     "husky": "7.0.4",
     "prettier": "2.8.3",
