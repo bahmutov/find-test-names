@@ -20,6 +20,9 @@ jobs:
       - name: Run bin file
         run: npm run demo
 
+      - name: Run print tests script
+        run: npm run demo-print
+
       - name: Run update Markdown file
         run: npm run demo-update-md
 

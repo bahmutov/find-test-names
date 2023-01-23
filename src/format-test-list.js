@@ -26,6 +26,10 @@ function formatTestList(tests, indent = 0) {
       nameLine += ` [${test.tags.join(', ')}]`
     }
 
+    if (Array.isArray(test.requiredTags)) {
+      nameLine += ` [[${test.requiredTags.join(', ')}]]`
+    }
+
     if (test.type === 'suite') {
       const children = [].concat(test.tests, test.suites).filter(Boolean)
       const nested = formatTestList(children, indent + 1)

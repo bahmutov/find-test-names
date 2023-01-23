@@ -47,3 +47,31 @@ test('suite with tags', (t) => {
     `,
   )
 })
+
+test('tests with required tags', (t) => {
+  t.plan(1)
+  const tests = [
+    {
+      name: 'first',
+      requiredTags: ['tag1', 'tag2'],
+    },
+    {
+      name: 'second',
+      tags: ['@sanity'],
+    },
+    {
+      name: 'both',
+      tags: ['one'],
+      requiredTags: ['two'],
+    },
+  ]
+  const s = formatTestList(tests)
+  t.deepEqual(
+    s,
+    stripIndent`
+      ├─ first [[tag1, tag2]]
+      ├─ second [@sanity]
+      └─ both [one] [[two]]
+    `,
+  )
+})

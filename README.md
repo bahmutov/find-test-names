@@ -162,6 +162,14 @@ If there are tags, they are shown after the name
 └─ last
 ```
 
+If there are required test tags, they are shown after the test name using double brackets `[[ ]]`
+
+```
+├─ first [tag1, tag2]
+├─ second [@sanity] [[clean]]
+└─ last
+```
+
 ### Unknown test names
 
 Sometimes a test name comes from a variable, not from a literal string.
