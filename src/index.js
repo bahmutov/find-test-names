@@ -53,12 +53,12 @@ const getTags = (source, node) => {
 }
 
 /**
- * Finds "onlyTags" field in the test node.
+ * Finds the "requiredTags" field in the test node.
  * Could be a single string or an array of strings.
  *
- * it('name', {onlyTags: '@smoke'}, () => ...)
+ * it('name', {requiredTags: '@smoke'}, () => ...)
  */
-const getOnlyTags = (source, node) => {
+const getRequiredTags = (source, node) => {
   if (node.arguments.length < 2) {
     // pending tests don't have tags
     return
@@ -67,7 +67,7 @@ const getOnlyTags = (source, node) => {
   if (node.arguments[1].type === 'ObjectExpression') {
     // extract any possible tags
     const tags = node.arguments[1].properties.find((node) => {
-      return node.key.name === 'onlyTags'
+      return node.key.name === 'requiredTags'
     })
     if (tags) {
       if (tags.value.type === 'ArrayExpression') {
@@ -155,15 +155,15 @@ const getDescribe = (node, source, pending = false) => {
     suiteInfo.tags = tags
   }
 
-  const onlyTags = getOnlyTags(source, node)
-  if (Array.isArray(onlyTags) && onlyTags.length > 0) {
-    suiteInfo.onlyTags = onlyTags
+  const requiredTags = getRequiredTags(source, node)
+  if (Array.isArray(requiredTags) && requiredTags.length > 0) {
+    suiteInfo.requiredTags = requiredTags
   }
 
   const suite = {
     name,
     tags: suiteInfo.tags,
-    onlyTags: suiteInfo.onlyTags,
+    requiredTags: suiteInfo.requiredTags,
     pending: suiteInfo.pending,
     type: 'suite',
     tests: [],
@@ -204,15 +204,15 @@ const getIt = (node, source, pending = false) => {
   if (Array.isArray(tags) && tags.length > 0) {
     testInfo.tags = tags
   }
-  const onlyTags = getOnlyTags(source, node)
-  if (Array.isArray(onlyTags) && onlyTags.length > 0) {
-    testInfo.onlyTags = onlyTags
+  const requiredTags = getRequiredTags(source, node)
+  if (Array.isArray(requiredTags) && requiredTags.length > 0) {
+    testInfo.requiredTags = requiredTags
   }
 
   const test = {
     name,
     tags: testInfo.tags,
-    onlyTags: testInfo.onlyTags,
+    requiredTags: testInfo.requiredTags,
     pending: testInfo.pending,
     type: 'test',
   }
@@ -459,10 +459,10 @@ function collectSuiteTagsUp(suite) {
   return tags
 }
 
-function collectSuiteOnlyTagsUp(suite) {
+function collectSuiteRequiredTagsUp(suite) {
   const tags = []
   while (suite) {
-    tags.push(...(suite.onlyTags || []))
+    tags.push(...(suite.requiredTags || []))
     suite = suite.parent
   }
   return tags
@@ -529,6 +529,15 @@ function countTags(structure) {
   return tags
 }
 
+function combineTags(tags, suiteTags) {
+  // normalize the tags to be an array of strings
+  const ownTags = [].concat(tags || [])
+  const allTags = [...ownTags, ...suiteTags]
+  const uniqueTags = [...new Set(allTags)]
+  const sortedTags = [...new Set(uniqueTags)].sort()
+  return sortedTags
+}
+
 /**
  * Visits each test and counts its tags and its parents' tags
  * to compute the "effective" tags list.
@@ -537,22 +546,14 @@ function setEffectiveTags(structure) {
   setParentSuite(structure)
 
   visitEachTest(structure, (test, parentSuite) => {
-    // normalize the tags to be an array of strings
-    const ownTags = [].concat(test.tags || [])
-    const ownOnlyTags = [].concat(test.onlyTags || [])
-
     // also consider the effective tags by traveling up
     // the parent chain of suites
     const suiteTags = collectSuiteTagsUp(parentSuite)
-    const allTags = [...ownTags, ...suiteTags]
-    const uniqueTags = [...new Set(allTags)]
-    test.effectiveTags = uniqueTags.sort()
+    test.effectiveTags = combineTags(test.tags, suiteTags)
 
     // collect the "only tags" up the suite parents
-    const suiteOnlyTags = collectSuiteOnlyTagsUp(parentSuite)
-    const allOnlyTags = [...ownOnlyTags, ...suiteOnlyTags]
-    const uniqueOnlyTags = [...new Set(allOnlyTags)]
-    test.onlyTags = [...new Set(uniqueOnlyTags)].sort()
+    const suiteRequiredTags = collectSuiteRequiredTagsUp(parentSuite)
+    test.requiredTags = combineTags(test.requiredTags, suiteRequiredTags)
   })
 
   return structure
@@ -796,7 +797,7 @@ function findEffectiveTestTags(source) {
     }
     testTags[test.fullName] = {
       effectiveTags: test.effectiveTags,
-      onlyTags: test.onlyTags,
+      requiredTags: test.requiredTags,
     }
   })
 
