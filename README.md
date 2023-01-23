@@ -96,6 +96,23 @@ Returns a single object with full test titles as keys. For each key, the value i
 
 You can use the utility method `findEffectiveTestTagsIn(filename)` to let this module read the file from disk and find the effective tags that apply to each test by its full title.
 
+### requiredTags
+
+The test and suite options object can have another list of tags called `requiredTags`
+
+```js
+it(
+  'works a',
+  {
+    tags: '@one',
+    requiredTags: ['@data'],
+  },
+  () => {},
+)
+```
+
+These tags also will be extracted and the effective required tags from the parent suites applied to the children tests.
+
 ### Bin
 
 This package includes [bin/find-test-names.js](./bin/find-test-names.js) that you can use from the command line

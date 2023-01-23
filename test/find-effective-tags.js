@@ -17,16 +17,16 @@ test('finds effective test tags for each test', (t) => {
   `
   const result = findEffectiveTestTags(source)
   const expected = {
-    'sits at the top': { effectiveTags: ['@root'], onlyTags: [] },
+    'sits at the top': { effectiveTags: ['@root'], requiredTags: [] },
     'parent child works a': {
       effectiveTags: ['@auth', '@one', '@user'],
-      onlyTags: [],
+      requiredTags: [],
     },
     'parent child works b': {
       effectiveTags: ['@auth', '@user'],
-      onlyTags: [],
+      requiredTags: [],
     },
-    'has no tags': { effectiveTags: [], onlyTags: [] },
+    'has no tags': { effectiveTags: [], requiredTags: [] },
   }
   t.deepEqual(result, expected)
 })
@@ -36,8 +36,8 @@ test('finds effective test tags in a file', (t) => {
   const specFilename = join(__dirname, '..', 'test-cy', 'spec-a.js')
   const result = findEffectiveTestTagsIn(specFilename)
   const expected = {
-    'Suite A works 1': { effectiveTags: [], onlyTags: [] },
-    'Suite A works 2': { effectiveTags: ['A'], onlyTags: [] },
+    'Suite A works 1': { effectiveTags: [], requiredTags: [] },
+    'Suite A works 2': { effectiveTags: ['A'], requiredTags: [] },
   }
   t.deepEqual(result, expected)
 })
