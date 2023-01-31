@@ -13,13 +13,14 @@ test('applies required tags to the tests inside the suite', (t) => {
     })
   `
   const result = findEffectiveTestTags(source)
+  // the required tags ARE effective tags too
   const expected = {
     'parent child works a': {
-      effectiveTags: [],
+      effectiveTags: ['@top'],
       requiredTags: ['@top'],
     },
     'parent child works b': {
-      effectiveTags: [],
+      effectiveTags: ['@top'],
       requiredTags: ['@top'],
     },
   }

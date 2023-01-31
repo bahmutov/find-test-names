@@ -551,9 +551,12 @@ function setEffectiveTags(structure) {
     const suiteTags = collectSuiteTagsUp(parentSuite)
     test.effectiveTags = combineTags(test.tags, suiteTags)
 
-    // collect the "only tags" up the suite parents
+    // collect the required tags up the suite parents
     const suiteRequiredTags = collectSuiteRequiredTagsUp(parentSuite)
     test.requiredTags = combineTags(test.requiredTags, suiteRequiredTags)
+
+    // note, the required tags are also EFFECTIVE tags, so combine them
+    test.effectiveTags = [...test.effectiveTags, ...test.requiredTags].sort()
   })
 
   return structure

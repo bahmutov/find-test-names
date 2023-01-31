@@ -10,7 +10,8 @@ test('finds only tags in a single test', (t) => {
   `
   const result = findEffectiveTestTags(source)
   const expected = {
-    works: { effectiveTags: ['@one'], requiredTags: ['@special'] },
+    // required tag is also an effective tag
+    works: { effectiveTags: ['@one', '@special'], requiredTags: ['@special'] },
   }
   t.deepEqual(result, expected)
 })
@@ -24,7 +25,12 @@ test('applies suite only tags to the tests', (t) => {
   `
   const result = findEffectiveTestTags(source)
   const expected = {
-    'parent works': { effectiveTags: ['@one'], requiredTags: ['@special'] },
+    'parent works': {
+      // the required tag from the parent applies to the child test
+      // as an effective tag
+      effectiveTags: ['@one', '@special'],
+      requiredTags: ['@special'],
+    },
   }
   t.deepEqual(result, expected)
 })
@@ -38,7 +44,11 @@ test('combines suite and test only tags', (t) => {
   `
   const result = findEffectiveTestTags(source)
   const expected = {
-    'parent works': { effectiveTags: [], requiredTags: ['@special', '@super'] },
+    'parent works': {
+      // required tags also act as effective tags
+      effectiveTags: ['@special', '@super'],
+      requiredTags: ['@special', '@super'],
+    },
   }
   t.deepEqual(result, expected)
 })
