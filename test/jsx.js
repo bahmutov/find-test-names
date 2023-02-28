@@ -3,8 +3,8 @@ const { getTestNames } = require('..')
 const test = require('ava')
 
 // https://github.com/bahmutov/find-test-names/issues/64
-test.skip('jsx', (t) => {
-  t.plan(0)
+test('jsx', (t) => {
+  t.plan(1)
   const source = stripIndent`
     describe('parent', () => {
       it('has jsx component', () => {
@@ -13,5 +13,12 @@ test.skip('jsx', (t) => {
     })
   `
   const result = getTestNames(source)
-  console.log(result)
+  t.deepEqual(result, {
+    suiteNames: ['parent'],
+    testNames: ['has jsx component'],
+    tests: [
+      { type: 'test', pending: false, name: 'has jsx component' },
+      { type: 'suite', pending: false, name: 'parent' },
+    ],
+  })
 })

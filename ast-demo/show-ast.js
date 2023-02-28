@@ -7,10 +7,14 @@ const source = `
 
   // this is a comment
   const foo = 'bar'
+
+  // JSX
+  const Coounter = () => <div>Count</div>
 `
 
 const plugins = [
   'estree', // To generate estree compatible AST
+  'jsx',
 ]
 
 const AST = babel.parse(source, {

@@ -113,6 +113,11 @@ it(
 
 These tags also will be extracted and the effective required tags from the parent suites applied to the children tests.
 
+### Supports
+
+- JSX in the source code
+- TypeScript
+
 ### Bin
 
 This package includes [bin/find-test-names.js](./bin/find-test-names.js) that you can use from the command line
@@ -199,6 +204,15 @@ it('works', ...)
 ## Debugging
 
 Run with the environment variable `DEBUG=find-test-names` to see verbose logs
+
+```
+$ DEBUG=find-test-names npx find-test-names
+...
+2023-02-28T12:45:21.074Z find-test-names parsing source as a script
+2023-02-28T12:45:21.083Z find-test-names success!
+2023-02-28T12:45:21.084Z find-test-names found test "has jsx component"
+2023-02-28T12:45:21.084Z find-test-names found describe "parent"
+```
 
 ## Small print
 
