@@ -37,7 +37,7 @@
   },
   "homepage": "https://github.com/bahmutov/find-test-names#readme",
   "dependencies": {
-    "@babel/parser": "^7.16.5",
+    "@babel/parser": "^7.21.2",
     "acorn-walk": "^8.2.0",
     "debug": "^4.3.3",
     "globby": "^11.0.4",
