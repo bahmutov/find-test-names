@@ -95,6 +95,7 @@ const extractTestName = (node) => {
 }
 
 const plugins = [
+  'jsx',
   'estree', // To generate estree compatible AST
   'typescript',
 ]
