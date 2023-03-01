@@ -760,6 +760,7 @@ function getTestNames(source, withStructure) {
         } else if (isItOnly(node)) {
           const { testInfo, test } = getIt(node, source, false)
           testInfo.exclusive = true
+          test.exclusive = true
           debug('found it.only "%s"', testInfo.name)
 
           const comment = getLeadingComment(ancestors)
