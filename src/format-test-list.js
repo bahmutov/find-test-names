@@ -5,6 +5,8 @@ const lastSpacer = '└─ '
 const middleSpacer = '├─ '
 const pendingLastSpacer = '└⊙ '
 const pendingMiddleSpacer = '├⊙ '
+const exclusiveLastSpacer = '└> '
+const exclusiveMiddleSpacer = '├> '
 
 function formatTestList(tests, indent = 0) {
   const lastIndex = tests.length - 1
@@ -16,9 +18,17 @@ function formatTestList(tests, indent = 0) {
   const lines = tests.map((test, k) => {
     let start
     if (k === lastIndex) {
-      start = test.pending ? pendingLastSpacer : lastSpacer
+      start = test.pending
+        ? pendingLastSpacer
+        : test.exclusive
+        ? exclusiveLastSpacer
+        : lastSpacer
     } else {
-      start = test.pending ? pendingMiddleSpacer : middleSpacer
+      start = test.pending
+        ? pendingMiddleSpacer
+        : test.exclusive
+        ? exclusiveMiddleSpacer
+        : middleSpacer
     }
 
     let nameLine = test.name ? `${start}${test.name}` : `${start}<unknown test>`
