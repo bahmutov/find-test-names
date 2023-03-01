@@ -24,6 +24,12 @@ const isItSkip = (node) =>
   (node.callee.object.name === 'it' || node.callee.object.name === 'specify') &&
   node.callee.property.name === 'skip'
 
+const isItOnly = (node) =>
+  node.type === 'CallExpression' &&
+  node.callee.type === 'MemberExpression' &&
+  (node.callee.object.name === 'it' || node.callee.object.name === 'specify') &&
+  node.callee.property.name === 'only'
+
 /**
  * Finds "tags" field in the test node.
  * Could be a single string or an array of strings.
@@ -729,6 +735,37 @@ function getTestNames(source, withStructure) {
           if (comment) {
             testInfo.comment = comment
             debug('found leading skipped test comment "%s", comment')
+          }
+
+          const { suite, topLevelTest } = getSuiteAncestorsForTest(
+            test,
+            source,
+            ancestors,
+            nodes,
+            fullSuiteNames,
+          )
+
+          if (suite) {
+            structure.push(suite)
+          } else if (topLevelTest) {
+            structure.push(test)
+          }
+
+          if (typeof testInfo.name !== 'undefined') {
+            testNames.push(testInfo.name)
+            fullTestNames.push(test.fullName)
+          }
+
+          tests.push(testInfo)
+        } else if (isItOnly(node)) {
+          const { testInfo, test } = getIt(node, source, false)
+          testInfo.exclusive = true
+          debug('found it.only "%s"', testInfo.name)
+
+          const comment = getLeadingComment(ancestors)
+          if (comment) {
+            testInfo.comment = comment
+            debug('found leading only test comment "%s", comment')
           }
 
           const { suite, topLevelTest } = getSuiteAncestorsForTest(

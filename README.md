@@ -159,6 +159,14 @@ Pending tests and suites are marked with `⊙` character like this:
 └⊙ last
 ```
 
+Exclusive tests are shown with `>` character like this:
+
+```
+├─ first
+├> second
+└─ last
+```
+
 If there are tags, they are shown after the name
 
 ```

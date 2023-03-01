@@ -270,6 +270,32 @@ test('pending suite', (t) => {
   )
 })
 
+test('exclusive test', (t) => {
+  t.plan(1)
+  const tests = [
+    {
+      name: 'first',
+    },
+    {
+      name: 'second',
+      exclusive: true,
+    },
+    {
+      name: 'last',
+      exclusive: true,
+    },
+  ]
+  const s = formatTestList(tests)
+  t.deepEqual(
+    s,
+    stripIndent`
+      ├─ first
+      ├> second
+      └> last
+    `,
+  )
+})
+
 // https://github.com/bahmutov/find-test-names/issues/15
 test('inner suite', (t) => {
   t.plan(1)
