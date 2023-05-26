@@ -501,6 +501,10 @@ function visitEachNode(structure, fn, parentSuite) {
   })
 }
 
+function concatTags(tags, requiredTags) {
+  return [].concat(tags || []).concat(requiredTags || [])
+}
+
 /**
  * Counts the tags found on the tests.
  * @param {object} structure
@@ -512,7 +516,7 @@ function countTags(structure) {
   const tags = {}
   visitEachTest(structure, (test, parentSuite) => {
     // normalize the tags to be an array of strings
-    const list = [].concat(test.tags || [])
+    const list = concatTags(test.tags, test.requiredTags)
     list.forEach((tag) => {
       if (!(tag in tags)) {
         tags[tag] = 1
