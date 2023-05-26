@@ -50,3 +50,25 @@ test('combines all tags', (t) => {
     '@five': 1,
   })
 })
+
+test('counts the required tags', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    it('works a', () => {})
+    it('works b', {requiredTags: '@user'}, () => {})
+  `
+  const result = getTestNames(source, true)
+  const counts = countTags(result.structure)
+  t.deepEqual(counts, { '@user': 1 })
+})
+
+test('combines counts', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    it('works a', {tags: '@user'}, () => {})
+    it('works b', {requiredTags: '@user'}, () => {})
+  `
+  const result = getTestNames(source, true)
+  const counts = countTags(result.structure)
+  t.deepEqual(counts, { '@user': 2 })
+})
