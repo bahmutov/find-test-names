@@ -19,7 +19,8 @@
     "demo-update-md": "DEBUG=find-test-names node bin/update-test-count.js out.md 'test-cy/**/*.js'",
     "demo-print": "node bin/print-tests.js 'test-cy/**/*.js'",
     "stop-only": "DEBUG=stop-only stop-only --folder test --exclude exclusive.js",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "deps": "npm audit --report --omit dev"
   },
   "repository": {
     "type": "git",
@@ -37,8 +38,8 @@
   },
   "homepage": "https://github.com/bahmutov/find-test-names#readme",
   "dependencies": {
-    "@babel/parser": "^7.21.2",
-    "@babel/plugin-syntax-jsx": "^7.18.6",
+    "@babel/parser": "^7.23.0",
+    "@babel/plugin-syntax-jsx": "^7.22.5",
     "acorn-walk": "^8.2.0",
     "debug": "^4.3.3",
     "globby": "^11.0.4",
