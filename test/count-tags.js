@@ -30,6 +30,22 @@ test('tags apply from all parent suites', (t) => {
   t.deepEqual(counts, { '@basic': 2 })
 })
 
+// https://github.com/bahmutov/find-test-names/issues/95
+test('and required tags apply from all parent suites', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    describe('parent', {requiredTags: '@basic'}, () => {
+      describe('inner', () => {
+        it('works a', () => {})
+        it('works b', () => {})
+      })
+    })
+  `
+  const result = getTestNames(source, true)
+  const counts = countTags(result.structure)
+  t.deepEqual(counts, { '@basic': 2 })
+})
+
 test('combines all tags', (t) => {
   t.plan(1)
   const source = stripIndent`

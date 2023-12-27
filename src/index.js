@@ -535,6 +535,16 @@ function countTags(structure) {
         tags[tag] += 1
       }
     })
+
+    // plus the required tag up the chain of parents
+    const suiteRequiredTags = collectSuiteRequiredTagsUp(parentSuite)
+    suiteRequiredTags.forEach((tag) => {
+      if (!(tag in tags)) {
+        tags[tag] = 1
+      } else {
+        tags[tag] += 1
+      }
+    })
   })
 
   return tags
