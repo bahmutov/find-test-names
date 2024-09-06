@@ -51,6 +51,6 @@
     "husky": "8.0.3",
     "prettier": "3.3.3",
     "semantic-release": "24.1.0",
-    "stop-only": "3.4.0"
+    "stop-only": "3.4.1"
   }
 }
