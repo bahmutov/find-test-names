@@ -109,3 +109,51 @@ test('describe with tags', (t) => {
     ],
   })
 })
+
+test('spread config parameter', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    const VIEWPORT =  {
+      viewportHeight: 800,
+      viewportWidth: 360,
+    };
+    it('works', { tags: '@foo', ...VIEWPORT }, () => {})
+  `
+  const result = getTestNames(source)
+  t.deepEqual(result, {
+    suiteNames: [],
+    testNames: ['works'],
+    tests: [
+      {
+        name: 'works',
+        tags: ['@foo'],
+        type: 'test',
+        pending: false,
+      },
+    ],
+  })
+})
+
+test('spread config parameter with required tags', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    const VIEWPORT =  {
+      viewportHeight: 800,
+      viewportWidth: 360,
+    };
+    it('works', { requiredTags: '@foo', ...VIEWPORT }, () => {})
+  `
+  const result = getTestNames(source)
+  t.deepEqual(result, {
+    suiteNames: [],
+    testNames: ['works'],
+    tests: [
+      {
+        name: 'works',
+        requiredTags: ['@foo'],
+        type: 'test',
+        pending: false,
+      },
+    ],
+  })
+})
