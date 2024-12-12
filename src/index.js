@@ -33,6 +33,19 @@ const isItOnly = (node) =>
 // list of known static constant variable declarations (in the current file)
 const constants = new Map()
 
+const getResolvedTag = (node) => {
+  if (node.type === 'Literal') {
+    return node.value
+  } else if (node.type === 'Identifier') {
+    debug('tag is a potential local identifier "%s"', node.name)
+    if (constants.has(node.name)) {
+      const tagValue = constants.get(node.name)
+      debug('found constant value "%s" for the tag "%s"', tagValue, node.name)
+      return tagValue
+    }
+  }
+}
+
 /**
  * Finds "tags" field in the test node.
  * Could be a single string or an array of strings.
@@ -52,21 +65,12 @@ const getTags = (source, node) => {
     })
     if (tags) {
       if (tags.value.type === 'ArrayExpression') {
-        const tagsText = source.slice(tags.start, tags.end)
-        return eval(tagsText)
-      } else if (tags.value.type === 'Literal') {
-        return [tags.value.value]
-      } else if (tags.value.type === 'Identifier') {
-        debug('tag is a potential local identifier "%s"', tags.value.name)
-        if (constants.has(tags.value.name)) {
-          const tagValue = constants.get(tags.value.name)
-          debug(
-            'found constant value "%s" for the tag "%s"',
-            tagValue,
-            tags.value.name,
-          )
-          return [tagValue]
-        }
+        return tags.value.elements.map(getResolvedTag)
+      } else if (
+        tags.value.type === 'Literal' ||
+        tags.value.type === 'Identifier'
+      ) {
+        return [getResolvedTag(tags.value)]
       }
     }
   }
@@ -91,24 +95,12 @@ const getRequiredTags = (source, node) => {
     })
     if (tags) {
       if (tags.value.type === 'ArrayExpression') {
-        const tagsText = source.slice(tags.start, tags.end)
-        return eval(tagsText)
-      } else if (tags.value.type === 'Literal') {
-        return [tags.value.value]
-      } else if (tags.value.type === 'Identifier') {
-        debug(
-          'required tag is a potential local identifier "%s"',
-          tags.value.name,
-        )
-        if (constants.has(tags.value.name)) {
-          const tagValue = constants.get(tags.value.name)
-          debug(
-            'found constant value "%s" for the required tag "%s"',
-            tagValue,
-            tags.value.name,
-          )
-          return [tagValue]
-        }
+        return tags.value.elements.map(getResolvedTag)
+      } else if (
+        tags.value.type === 'Literal' ||
+        tags.value.type === 'Identifier'
+      ) {
+        return [getResolvedTag(tags.value)]
       }
     }
   }

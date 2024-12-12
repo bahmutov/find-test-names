@@ -48,13 +48,24 @@ test('resolves a single local constant required tag', (t) => {
   })
 })
 
-test.skip('resolves a list of tags with a local constant', (t) => {
-  t.plan(0)
+test('resolves a list of tags with a local constant', (t) => {
+  t.plan(1)
   const source = stripIndent`
     const bar = '@bar';
 
     it('works', { tags: ['@foo', bar] }, () => {})
   `
   const result = getTestNames(source)
-  console.log(result)
+  t.deepEqual(result, {
+    suiteNames: [],
+    testNames: ['works'],
+    tests: [
+      {
+        name: 'works',
+        tags: ['@foo', '@bar'],
+        type: 'test',
+        pending: false,
+      },
+    ],
+  })
 })
