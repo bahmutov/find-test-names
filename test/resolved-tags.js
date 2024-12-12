@@ -69,3 +69,53 @@ test('resolves a list of tags with a local constant', (t) => {
     ],
   })
 })
+
+test('resolves a property of an object as a single tag', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    const TAGS = {
+      foo: '@foo',
+    }
+
+    it('works', { tags: TAGS.foo }, () => {})
+  `
+  const result = getTestNames(source)
+  // console.log(result)
+  t.deepEqual(result, {
+    suiteNames: [],
+    testNames: ['works'],
+    tests: [
+      {
+        name: 'works',
+        tags: ['@foo'],
+        type: 'test',
+        pending: false,
+      },
+    ],
+  })
+})
+
+test('resolves a property of an object from an array', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    const TAGS = {
+      foo: '@foo',
+    }
+
+    it('works', { tags: ['@sanity', TAGS.foo] }, () => {})
+  `
+  const result = getTestNames(source)
+  // console.log(result)
+  t.deepEqual(result, {
+    suiteNames: [],
+    testNames: ['works'],
+    tests: [
+      {
+        name: 'works',
+        tags: ['@sanity', '@foo'],
+        type: 'test',
+        pending: false,
+      },
+    ],
+  })
+})

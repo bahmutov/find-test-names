@@ -118,6 +118,38 @@ These tags also will be extracted and the effective required tags from the paren
 - JSX in the source code
 - TypeScript
 
+### tag variables
+
+Typically, test tags are static literals, like
+
+```js
+it('works', { tags: '@user' })
+```
+
+But sometimes you want to use variables to set them. To be able to statically analyze the source files, this package currently supports:
+
+- local constants
+
+```js
+const USER = '@user'
+
+// in the same file
+it('works', { tags: USER })
+it('works', { tags: ['@sanity', USER] })
+```
+
+- local objects with literal property access
+
+```js
+const TAGS = {
+  user: '@user',
+}
+
+// in the same file
+it('works', { tags: TAGS.user })
+it('works', { tags: ['@sanity', TAGS.user] })
+```
+
 ### Bin
 
 This package includes [bin/find-test-names.js](./bin/find-test-names.js) that you can use from the command line

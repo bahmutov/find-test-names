@@ -43,6 +43,13 @@ const getResolvedTag = (node) => {
       debug('found constant value "%s" for the tag "%s"', tagValue, node.name)
       return tagValue
     }
+  } else if (node.type === 'MemberExpression') {
+    const key = `${node.object.name}.${node.property.name}`
+    if (constants.has(key)) {
+      const tagValue = constants.get(key)
+      debug('found constant value "%s" for the tag "%s"', tagValue, key)
+      return tagValue
+    }
   }
 }
 
@@ -68,7 +75,8 @@ const getTags = (source, node) => {
         return tags.value.elements.map(getResolvedTag)
       } else if (
         tags.value.type === 'Literal' ||
-        tags.value.type === 'Identifier'
+        tags.value.type === 'Identifier' ||
+        tags.value.type === 'MemberExpression'
       ) {
         return [getResolvedTag(tags.value)]
       }
@@ -699,15 +707,38 @@ function getTestNames(source, withStructure) {
     {
       VariableDeclaration(node) {
         if (node.kind === 'const') {
+          // console.log(node.declarations)
           node.declarations
             .filter((decl) => decl.type === 'VariableDeclarator')
+            .filter((decl) => decl.id.type === 'Identifier')
             .filter(
               (decl) =>
-                decl.id.type === 'Identifier' && decl.init.type === 'Literal',
+                decl.init.type === 'Literal' ||
+                decl.init.type === 'ObjectExpression',
             )
             .forEach((decl) => {
-              constants.set(decl.id.name, decl.init.value)
-              debug(`found constant ${decl.id.name} = ${decl.init.value}`)
+              if (decl.init.type === 'ObjectExpression') {
+                // console.log(decl.init.properties)
+                decl.init.properties
+                  .filter(
+                    (prop) =>
+                      prop.type === 'Property' &&
+                      prop.key.type === 'Identifier' &&
+                      prop.value.type === 'Literal',
+                  )
+                  .forEach((prop) => {
+                    // object like "const foo = { bar: 'baz' }"
+                    // for each property, save the constant to "foo.bar" value
+                    const key = `${decl.id.name}.${prop.key.name}`
+                    const value = prop.value.value
+                    constants.set(key, value)
+                    debug(`found property constant ${key} = ${value}`)
+                  })
+              } else {
+                // literal like "const foo = 'bar'"
+                constants.set(decl.id.name, decl.init.value)
+                debug(`found constant ${decl.id.name} = ${decl.init.value}`)
+              }
             })
         }
       },
