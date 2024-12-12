@@ -30,6 +30,29 @@ const isItOnly = (node) =>
   (node.callee.object.name === 'it' || node.callee.object.name === 'specify') &&
   node.callee.property.name === 'only'
 
+// list of known static constant variable declarations (in the current file)
+const constants = new Map()
+
+const getResolvedTag = (node) => {
+  if (node.type === 'Literal') {
+    return node.value
+  } else if (node.type === 'Identifier') {
+    debug('tag is a potential local identifier "%s"', node.name)
+    if (constants.has(node.name)) {
+      const tagValue = constants.get(node.name)
+      debug('found constant value "%s" for the tag "%s"', tagValue, node.name)
+      return tagValue
+    }
+  } else if (node.type === 'MemberExpression') {
+    const key = `${node.object.name}.${node.property.name}`
+    if (constants.has(key)) {
+      const tagValue = constants.get(key)
+      debug('found constant value "%s" for the tag "%s"', tagValue, key)
+      return tagValue
+    }
+  }
+}
+
 /**
  * Finds "tags" field in the test node.
  * Could be a single string or an array of strings.
@@ -49,10 +72,13 @@ const getTags = (source, node) => {
     })
     if (tags) {
       if (tags.value.type === 'ArrayExpression') {
-        const tagsText = source.slice(tags.start, tags.end)
-        return eval(tagsText)
-      } else if (tags.value.type === 'Literal') {
-        return [tags.value.value]
+        return tags.value.elements.map(getResolvedTag)
+      } else if (
+        tags.value.type === 'Literal' ||
+        tags.value.type === 'Identifier' ||
+        tags.value.type === 'MemberExpression'
+      ) {
+        return [getResolvedTag(tags.value)]
       }
     }
   }
@@ -77,10 +103,12 @@ const getRequiredTags = (source, node) => {
     })
     if (tags) {
       if (tags.value.type === 'ArrayExpression') {
-        const tagsText = source.slice(tags.start, tags.end)
-        return eval(tagsText)
-      } else if (tags.value.type === 'Literal') {
-        return [tags.value.value]
+        return tags.value.elements.map(getResolvedTag)
+      } else if (
+        tags.value.type === 'Literal' ||
+        tags.value.type === 'Identifier'
+      ) {
+        return [getResolvedTag(tags.value)]
       }
     }
   }
@@ -671,9 +699,49 @@ function getTestNames(source, withStructure) {
   // Tree of describes and tests
   let structure = []
 
+  debug('clearing local file constants')
+  constants.clear()
+
   walk.ancestor(
     AST,
     {
+      VariableDeclaration(node) {
+        if (node.kind === 'const') {
+          // console.log(node.declarations)
+          node.declarations
+            .filter((decl) => decl.type === 'VariableDeclarator')
+            .filter((decl) => decl.id.type === 'Identifier')
+            .filter(
+              (decl) =>
+                decl.init.type === 'Literal' ||
+                decl.init.type === 'ObjectExpression',
+            )
+            .forEach((decl) => {
+              if (decl.init.type === 'ObjectExpression') {
+                // console.log(decl.init.properties)
+                decl.init.properties
+                  .filter(
+                    (prop) =>
+                      prop.type === 'Property' &&
+                      prop.key.type === 'Identifier' &&
+                      prop.value.type === 'Literal',
+                  )
+                  .forEach((prop) => {
+                    // object like "const foo = { bar: 'baz' }"
+                    // for each property, save the constant to "foo.bar" value
+                    const key = `${decl.id.name}.${prop.key.name}`
+                    const value = prop.value.value
+                    constants.set(key, value)
+                    debug(`found property constant ${key} = ${value}`)
+                  })
+              } else {
+                // literal like "const foo = 'bar'"
+                constants.set(decl.id.name, decl.init.value)
+                debug(`found constant ${decl.id.name} = ${decl.init.value}`)
+              }
+            })
+        }
+      },
       CallExpression(node, ancestors) {
         if (isDescribe(node)) {
           const { suiteInfo } = getDescribe(node, source)
