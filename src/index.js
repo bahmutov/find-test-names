@@ -45,7 +45,7 @@ const getTags = (source, node) => {
   if (node.arguments[1].type === 'ObjectExpression') {
     // extract any possible tags
     const tags = node.arguments[1].properties.find((node) => {
-      return node.key.name === 'tags'
+      return node.key?.name === 'tags'
     })
     if (tags) {
       if (tags.value.type === 'ArrayExpression') {
