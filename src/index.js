@@ -30,6 +30,9 @@ const isItOnly = (node) =>
   (node.callee.object.name === 'it' || node.callee.object.name === 'specify') &&
   node.callee.property.name === 'only'
 
+// list of known static constant variable declarations (in the current file)
+const constants = new Map()
+
 /**
  * Finds "tags" field in the test node.
  * Could be a single string or an array of strings.
@@ -53,6 +56,17 @@ const getTags = (source, node) => {
         return eval(tagsText)
       } else if (tags.value.type === 'Literal') {
         return [tags.value.value]
+      } else if (tags.value.type === 'Identifier') {
+        debug('tag is a potential local identifier "%s"', tags.value.name)
+        if (constants.has(tags.value.name)) {
+          const tagValue = constants.get(tags.value.name)
+          debug(
+            'found constant value "%s" for the tag "%s"',
+            tagValue,
+            tags.value.name,
+          )
+          return [tagValue]
+        }
       }
     }
   }
@@ -81,6 +95,20 @@ const getRequiredTags = (source, node) => {
         return eval(tagsText)
       } else if (tags.value.type === 'Literal') {
         return [tags.value.value]
+      } else if (tags.value.type === 'Identifier') {
+        debug(
+          'required tag is a potential local identifier "%s"',
+          tags.value.name,
+        )
+        if (constants.has(tags.value.name)) {
+          const tagValue = constants.get(tags.value.name)
+          debug(
+            'found constant value "%s" for the required tag "%s"',
+            tagValue,
+            tags.value.name,
+          )
+          return [tagValue]
+        }
       }
     }
   }
@@ -671,9 +699,26 @@ function getTestNames(source, withStructure) {
   // Tree of describes and tests
   let structure = []
 
+  debug('clearing local file constants')
+  constants.clear()
+
   walk.ancestor(
     AST,
     {
+      VariableDeclaration(node) {
+        if (node.kind === 'const') {
+          node.declarations
+            .filter((decl) => decl.type === 'VariableDeclarator')
+            .filter(
+              (decl) =>
+                decl.id.type === 'Identifier' && decl.init.type === 'Literal',
+            )
+            .forEach((decl) => {
+              constants.set(decl.id.name, decl.init.value)
+              debug(`found constant ${decl.id.name} = ${decl.init.value}`)
+            })
+        }
+      },
       CallExpression(node, ancestors) {
         if (isDescribe(node)) {
           const { suiteInfo } = getDescribe(node, source)
