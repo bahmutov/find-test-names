@@ -33,14 +33,14 @@ const proxy = new Proxy(base, {
 function resolveExports(source) {
   let AST
   try {
-    debug('parsing source as a script')
+    debug('parsing source as a script for exports')
     AST = babel.parse(source, {
       plugins,
       sourceType: 'script',
     }).program
     debug('success!')
   } catch (e) {
-    debug('parsing source as a module')
+    debug('parsing source as a module for exports')
     AST = babel.parse(source, {
       plugins,
       sourceType: 'module',
