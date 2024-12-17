@@ -13,7 +13,7 @@
     "print-tests": "bin/print-tests.js"
   },
   "scripts": {
-    "test": "ava",
+    "test": "ava --config ava.config.mjs",
     "semantic-release": "semantic-release",
     "demo": "DEBUG=find-test-names node bin/find-test-names.js demo/spec.js",
     "demo-update-md": "DEBUG=find-test-names node bin/update-test-count.js out.md 'test-cy/**/*.js'",

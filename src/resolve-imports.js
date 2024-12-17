@@ -34,6 +34,8 @@ const proxy = new Proxy(base, {
 function resolveImportsInAst(AST, fileProvider) {
   const importedValues = {}
 
+  // console.dir(AST, { depth: null })
+
   walk.ancestor(
     AST,
     {

@@ -77,11 +77,17 @@ function resolveExports(source) {
     debug('success!')
   } catch (e) {
     debug('parsing source as a module for exports')
-    AST = babel.parse(source, {
-      plugins,
-      sourceType: 'module',
-    }).program
-    debug('success!')
+
+    try {
+      AST = babel.parse(source, {
+        plugins,
+        sourceType: 'module',
+      }).program
+      debug('success for exports!')
+    } catch (e) {
+      console.error(e)
+      console.error(source)
+    }
   }
 
   return resolveExportsInAst(AST, proxy)
