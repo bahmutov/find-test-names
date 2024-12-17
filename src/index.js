@@ -2,6 +2,8 @@ const babel = require('@babel/parser')
 const walk = require('acorn-walk')
 const debug = require('debug')('find-test-names')
 const { formatTestList } = require('./format-test-list')
+const { resolveImportsInAst } = require('./resolve-imports')
+const { relativePathResolver } = require('./relative-path-resolver')
 
 const isDescribeName = (name) => name === 'describe' || name === 'context'
 
@@ -615,11 +617,11 @@ function setEffectiveTags(structure) {
  * Visits each individual test in the structure and checks if it
  * has any effective tags from the given list.
  */
-function filterByEffectiveTags(structure, tags) {
+function filterByEffectiveTags(structure, tags, relativeFilename) {
   if (typeof structure === 'string') {
     // we got passed the input source code
     // so let's parse it first
-    const result = getTestNames(structure, true)
+    const result = getTestNames(structure, true, relativeFilename)
     setEffectiveTags(result.structure)
     return filterByEffectiveTags(result.structure, tags)
   }
@@ -664,7 +666,7 @@ function getLeadingComment(ancestors) {
  * @param {string} source
  * @param {boolean} withStructure - return nested structure of suites and tests
  */
-function getTestNames(source, withStructure) {
+function getTestNames(source, withStructure, currentFilename) {
   // should we pass the ecma version here?
   let AST
   try {
@@ -701,6 +703,13 @@ function getTestNames(source, withStructure) {
 
   debug('clearing local file constants')
   constants.clear()
+
+  // first, see if we can resolve any imports
+  // that resolve as constants
+  const filePathProvider = relativePathResolver(currentFilename)
+  debug('constructed file path provider wrt %s', currentFilename)
+  const resolvedImports = resolveImportsInAst(AST, filePathProvider)
+  debug('resolved imports %o', resolvedImports)
 
   walk.ancestor(
     AST,
@@ -904,12 +913,12 @@ function getTestNames(source, withStructure) {
  * Each key is the full test title.
  * The value is a list of effective tags for this test.
  */
-function findEffectiveTestTags(source) {
+function findEffectiveTestTags(source, currentFilename) {
   if (typeof source !== 'string') {
     throw new Error('Expected a string source')
   }
 
-  const result = getTestNames(source, true)
+  const result = getTestNames(source, true, currentFilename)
   setEffectiveTags(result.structure)
 
   const testTags = {}
@@ -936,7 +945,7 @@ function findEffectiveTestTags(source) {
 function findEffectiveTestTagsIn(specFilename) {
   const { readFileSync } = require('fs')
   const source = readFileSync(specFilename, 'utf8')
-  return findEffectiveTestTags(source)
+  return findEffectiveTestTags(source, specFilename)
 }
 
 module.exports = {
