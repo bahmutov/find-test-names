@@ -30,24 +30,7 @@ const proxy = new Proxy(base, {
   },
 })
 
-function resolveExports(source) {
-  let AST
-  try {
-    debug('parsing source as a script for exports')
-    AST = babel.parse(source, {
-      plugins,
-      sourceType: 'script',
-    }).program
-    debug('success!')
-  } catch (e) {
-    debug('parsing source as a module for exports')
-    AST = babel.parse(source, {
-      plugins,
-      sourceType: 'module',
-    }).program
-    debug('success!')
-  }
-
+function resolveExportsInAst(AST, proxy) {
   const exportedValues = {}
 
   walk.ancestor(
@@ -81,6 +64,27 @@ function resolveExports(source) {
   )
 
   return exportedValues
+}
+
+function resolveExports(source) {
+  let AST
+  try {
+    debug('parsing source as a script for exports')
+    AST = babel.parse(source, {
+      plugins,
+      sourceType: 'script',
+    }).program
+    debug('success!')
+  } catch (e) {
+    debug('parsing source as a module for exports')
+    AST = babel.parse(source, {
+      plugins,
+      sourceType: 'module',
+    }).program
+    debug('success!')
+  }
+
+  return resolveExportsInAst(AST, proxy)
 }
 
 module.exports = {

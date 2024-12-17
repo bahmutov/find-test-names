@@ -9,6 +9,15 @@ const fileProvider = (relativePath) => {
       export const bar = 'bar'
     `
   }
+
+  if (relativePath === './file-b') {
+    return stripIndent`
+      export const TAGS = {
+        user: '@user',
+        sanity: '@sanity',
+      }
+    `
+  }
 }
 
 test('finds the imports', (t) => {
@@ -49,4 +58,14 @@ test('non-existent import', (t) => {
 
   const result = resolveImports(source, fileProvider)
   t.deepEqual(result, {})
+})
+
+test('finds the exported object', (t) => {
+  t.plan(1)
+  const source = stripIndent`
+    import { TAGS } from './file-b'
+  `
+
+  const result = resolveImports(source, fileProvider)
+  t.deepEqual(result, { TAGS: { user: '@user', sanity: '@sanity' } })
 })
