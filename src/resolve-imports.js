@@ -31,24 +31,7 @@ const proxy = new Proxy(base, {
   },
 })
 
-function resolveImports(source, fileProvider) {
-  let AST
-  try {
-    debug('parsing source as a script for imports')
-    AST = babel.parse(source, {
-      plugins,
-      sourceType: 'script',
-    }).program
-    debug('success!')
-  } catch (e) {
-    debug('parsing source as a module for imports')
-    AST = babel.parse(source, {
-      plugins,
-      sourceType: 'module',
-    }).program
-    debug('success!')
-  }
-
+function resolveImportsInAst(AST, fileProvider) {
   const importedValues = {}
 
   walk.ancestor(
@@ -91,6 +74,28 @@ function resolveImports(source, fileProvider) {
   return importedValues
 }
 
+function resolveImports(source, fileProvider) {
+  let AST
+  try {
+    debug('parsing source as a script for imports')
+    AST = babel.parse(source, {
+      plugins,
+      sourceType: 'script',
+    }).program
+    debug('success!')
+  } catch (e) {
+    debug('parsing source as a module for imports')
+    AST = babel.parse(source, {
+      plugins,
+      sourceType: 'module',
+    }).program
+    debug('success!')
+  }
+
+  return resolveImportsInAst(AST, fileProvider)
+}
+
 module.exports = {
   resolveImports,
+  resolveImportsInAst,
 }
