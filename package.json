@@ -19,7 +19,7 @@
     "demo-update-md": "DEBUG=find-test-names node bin/update-test-count.js out.md 'test-cy/**/*.js'",
     "demo-print": "node bin/print-tests.js 'test-cy/**/*.js'",
     "stop-only": "DEBUG=stop-only stop-only --folder test --exclude exclusive.js",
-    "prepare": "husky install",
+    "prepare": "husky",
     "deps": "npm audit --report --omit dev"
   },
   "repository": {

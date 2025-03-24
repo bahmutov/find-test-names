@@ -722,8 +722,9 @@ function getTestNames(source, withStructure, currentFilename) {
             .filter((decl) => decl.id.type === 'Identifier')
             .filter(
               (decl) =>
-                decl.init.type === 'Literal' ||
-                decl.init.type === 'ObjectExpression',
+                decl.init && 
+                  (decl.init.type === 'Literal' ||
+                    decl.init.type === 'ObjectExpression'),
             )
             .forEach((decl) => {
               if (decl.init.type === 'ObjectExpression') {
