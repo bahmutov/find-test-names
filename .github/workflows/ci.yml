@@ -21,6 +21,9 @@ jobs:
       - name: Stop exclusive tests
         run: npm run stop-only
 
+      - name: Check dependencies
+        run: npm run deps
+
       - name: Run tests
         run: npm test
 
