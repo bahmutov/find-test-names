@@ -42,8 +42,8 @@
     "@babel/plugin-syntax-jsx": "^7.24.7",
     "acorn-walk": "^8.2.0",
     "debug": "^4.3.3",
-    "globby": "^11.0.4",
-    "simple-bin-help": "^1.8.0"
+    "simple-bin-help": "^1.8.0",
+    "tinyglobby": "^0.2.13"
   },
   "devDependencies": {
     "ava": "6.3.0",
