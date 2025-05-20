@@ -2,7 +2,7 @@
 
 const path = require('path')
 const fs = require('fs')
-const globby = require('globby')
+const tinyglobby = require('tinyglobby')
 const debug = require('debug')('find-test-names')
 
 require('simple-bin-help')({
@@ -15,7 +15,7 @@ const filename = process.argv[2]
 const pattern = process.argv[3]
 debug('using pattern "%s"', pattern)
 
-const filenames = globby.sync(pattern)
+const filenames = tinyglobby.globSync(pattern)
 debug('found %d files', filenames.length)
 debug(filenames)
 
