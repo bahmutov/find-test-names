@@ -59,14 +59,31 @@ function resolveImportsInAst(AST, fileProvider) {
         }
 
         node.specifiers.forEach((specifier) => {
-          const importedName = specifier.imported.name
-          const localName = specifier.local.name
-          debug('importing "%s" as "%s"', importedName, localName)
-          if (!exportedValues[importedName]) {
-            debug('could not find export "%s" in "%s"', importedName, fromWhere)
-            return
+          if (specifier.type === 'ImportDefaultSpecifier') {
+            // Handle default imports: import foo from 'module'
+            const localName = specifier.local.name
+            debug('importing default as "%s"', localName)
+            if (exportedValues.default) {
+              importedValues[localName] = exportedValues.default
+            } else {
+              debug('could not find default export in "%s"', fromWhere)
+            }
+          } else if (specifier.type === 'ImportNamespaceSpecifier') {
+            // Handle namespace imports: import * as foo from 'module'
+            const localName = specifier.local.name
+            debug('importing namespace as "%s"', localName)
+            importedValues[localName] = exportedValues
+          } else if (specifier.type === 'ImportSpecifier') {
+            // Handle named imports: import { foo } from 'module'
+            const importedName = specifier.imported.name
+            const localName = specifier.local.name
+            debug('importing "%s" as "%s"', importedName, localName)
+            if (!exportedValues[importedName]) {
+              debug('could not find export "%s" in "%s"', importedName, fromWhere)
+              return
+            }
+            importedValues[localName] = exportedValues[importedName]
           }
-          importedValues[localName] = exportedValues[importedName]
         })
       },
     },
