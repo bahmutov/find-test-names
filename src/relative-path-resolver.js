@@ -17,13 +17,23 @@ function relativePathResolver(currentFilename) {
       resolved,
     )
 
-    const exists = fs.existsSync(resolved)
-    if (!exists) {
-      debug('"%s" does not exist', resolved)
-      return
+    // Try the original path first
+    if (fs.existsSync(resolved)) {
+      return fs.readFileSync(resolved, 'utf-8')
     }
 
-    return fs.readFileSync(resolved, 'utf-8')
+    // Try with .ts and .js extensions
+    const extensions = ['.js', '.ts']
+    for (const ext of extensions) {
+      const resolvedWithExt = resolved + ext
+      if (fs.existsSync(resolvedWithExt)) {
+        debug('found "%s" with extension "%s"', resolved, ext)
+        return fs.readFileSync(resolvedWithExt, 'utf-8')
+      }
+    }
+
+    debug('"%s[.js|.ts]" does not exist', resolved)
+    return
   }
 }
 

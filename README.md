@@ -128,7 +128,7 @@ it('works', { tags: '@user' })
 
 But sometimes you want to use variables to set them. To be able to statically analyze the source files, this package currently supports:
 
-- local constants
+#### local constants
 
 ```js
 const USER = '@user'
@@ -138,7 +138,7 @@ it('works', { tags: USER })
 it('works', { tags: ['@sanity', USER] })
 ```
 
-- local objects with literal property access
+#### Local objects with literal property access
 
 ```js
 const TAGS = {
@@ -148,6 +148,96 @@ const TAGS = {
 // in the same file
 it('works', { tags: TAGS.user })
 it('works', { tags: ['@sanity', TAGS.user] })
+```
+
+#### Imported values (named imports)
+
+```js
+// tags.js
+export const userTag = '@user'
+export const adminTag = '@admin'
+
+// spec.cy.js
+import { userTag, adminTag } from './tags'
+
+it('works for user', { tags: userTag })
+it('works for admin', { tags: adminTag })
+```
+
+#### Imported values (default imports)
+
+```js
+// tag.js
+export default '@smoke'
+
+// spec.cy.js
+import smokeTag from './tag'
+
+it('works', { tags: smokeTag })
+```
+
+Default object imports are also supported:
+
+```js
+// roles.js
+export default {
+  user: '@user',
+  admin: '@admin'
+}
+
+// spec.cy.js
+import roles from './roles'
+
+it('works for user', { tags: roles.user })
+it('works for admin', { tags: roles.admin })
+```
+
+#### Imported values (namespace imports)
+
+```js
+// tags.js
+export const smoke = '@smoke'
+export const regression = '@regression'
+
+// spec.cy.js
+import * as Tags from './tags'
+
+it('smoke test', { tags: Tags.smoke })
+it('regression test', { tags: Tags.regression })
+```
+
+#### TypeScript enums
+
+```js
+// tags.ts
+export enum TestTags {
+  smoke = '@smoke',
+  regression = '@regression'
+}
+
+// spec.cy.js
+import { TestTags } from './tags'
+
+it('smoke test', { tags: TestTags.smoke })
+it('regression test', { tags: TestTags.regression })
+```
+
+Namespace imports with enums are also supported:
+
+```js
+import * as TagsModule from './tags'
+
+it('test', { tags: TagsModule.TestTags.smoke })
+```
+
+#### File extension resolution
+
+Import paths automatically resolve `.js` and `.ts` extensions:
+
+```js
+// Both work the same way
+import { tag } from './tags'      // resolves to ./tags.js or ./tags.ts
+import { tag } from './tags.js'   // explicit extension
 ```
 
 ### Bin
