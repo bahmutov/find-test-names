@@ -23,7 +23,7 @@ function relativePathResolver(currentFilename) {
     }
 
     // Try with .ts and .js extensions
-    const extensions = ['.ts', '.js']
+    const extensions = ['.js', '.ts']
     for (const ext of extensions) {
       const resolvedWithExt = resolved + ext
       if (fs.existsSync(resolvedWithExt)) {
