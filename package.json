@@ -38,12 +38,12 @@
   },
   "homepage": "https://github.com/bahmutov/find-test-names#readme",
   "dependencies": {
-    "@babel/parser": "^7.27.2",
-    "@babel/plugin-syntax-jsx": "^7.27.1",
-    "acorn-walk": "^8.2.0",
+    "@babel/parser": "^7.29.7",
+    "@babel/plugin-syntax-jsx": "^8.0.1",
+    "acorn-walk": "^8.3.5",
     "debug": "^4.3.3",
     "simple-bin-help": "^1.8.0",
-    "tinyglobby": "^0.2.13"
+    "tinyglobby": "^0.2.17"
   },
   "devDependencies": {
     "ava": "6.4.1",
