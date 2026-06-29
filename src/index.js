@@ -34,6 +34,7 @@ const isItOnly = (node) =>
 
 // list of known static constant variable declarations (in the current file)
 const constants = new Map()
+let resolvedImports = {}
 
 const getResolvedTag = (node) => {
   if (node.type === 'Literal') {
@@ -44,13 +45,50 @@ const getResolvedTag = (node) => {
       const tagValue = constants.get(node.name)
       debug('found constant value "%s" for the tag "%s"', tagValue, node.name)
       return tagValue
+    } else if (resolvedImports[node.name]) {
+      const tagValue = resolvedImports[node.name]
+      debug('found imported value "%s" for the tag "%s"', tagValue, node.name)
+      return tagValue
     }
   } else if (node.type === 'MemberExpression') {
-    const key = `${node.object.name}.${node.property.name}`
+    // Handle nested member expressions like TagsModule.TestTags.smoke
+    // We need to traverse from the root and navigate through the object
+    let current = resolvedImports
+    const parts = []
+
+    // Build the path by traversing the member expression tree
+    const buildPath = (expr) => {
+      if (expr.type === 'Identifier') {
+        parts.unshift(expr.name)
+      } else if (expr.type === 'MemberExpression') {
+        parts.unshift(expr.property.name)
+        buildPath(expr.object)
+      }
+    }
+
+    buildPath(node)
+    const key = parts.join('.')
+
+    // First check if it's a constant
     if (constants.has(key)) {
       const tagValue = constants.get(key)
       debug('found constant value "%s" for the tag "%s"', tagValue, key)
       return tagValue
+    }
+
+    // Then navigate through the resolved imports
+    for (const part of parts) {
+      if (current && typeof current === 'object' && part in current) {
+        current = current[part]
+      } else {
+        current = undefined
+        break
+      }
+    }
+
+    if (current !== undefined && typeof current !== 'object') {
+      debug('found imported value "%s" for the tag "%s"', current, key)
+      return current
     }
   }
 }
@@ -701,14 +739,15 @@ function getTestNames(source, withStructure, currentFilename) {
   // Tree of describes and tests
   let structure = []
 
-  debug('clearing local file constants')
+  debug('clearing local file constants and resolved imports')
   constants.clear()
+  resolvedImports = {}
 
   // first, see if we can resolve any imports
   // that resolve as constants
   const filePathProvider = relativePathResolver(currentFilename)
   debug('constructed file path provider wrt %s', currentFilename)
-  const resolvedImports = resolveImportsInAst(AST, filePathProvider)
+  resolvedImports = resolveImportsInAst(AST, filePathProvider)
   debug('resolved imports %o', resolvedImports)
 
   walk.ancestor(

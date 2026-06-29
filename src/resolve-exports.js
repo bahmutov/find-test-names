@@ -57,6 +57,39 @@ function resolveExportsInAst(AST, proxy) {
               }
             }
           })
+        } else if (node.declaration.type === 'TSEnumDeclaration') {
+          const enumName = node.declaration.id.name
+          const enumObj = {}
+
+          node.declaration.members.forEach((member) => {
+            const key = member.id.name
+            // Only support string enums, as tags are strings
+            if (member.initializer && member.initializer.type === 'Literal' && typeof member.initializer.value === 'string') {
+              enumObj[key] = member.initializer.value
+            }
+          })
+
+          exportedValues[enumName] = enumObj
+        }
+      },
+      ExportDefaultDeclaration(node) {
+        if (node.declaration.type === 'Literal') {
+          exportedValues.default = node.declaration.value
+        } else if (node.declaration.type === 'ObjectExpression') {
+          const obj = {}
+          node.declaration.properties.forEach((prop) => {
+            const value = prop.value
+            if (value.type === 'Literal') {
+              obj[prop.key.name] = value.value
+            }
+          })
+
+          exportedValues.default = obj
+        } else if (node.declaration.type === 'Identifier') {
+          // export default someVariable
+          // We would need to resolve the variable, which might be complex
+          // For now, we just mark that a default export exists
+          exportedValues.default = node.declaration.name
         }
       },
     },
